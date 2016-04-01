@@ -18,3 +18,17 @@ type Event struct {
 	Timestamp  int64             `json:"timestamp"`
 	ReceivedAt int64             `json:"receivedAt"`
 }
+
+// Validate the content of the event to be sure it has everything that's need
+func (e Event) Validate() (missingParameters []string) {
+	if e.UserID == "" {
+		missingParameters = append(missingParameters, "userID")
+	}
+	if e.Timestamp == 0 {
+		missingParameters = append(missingParameters, "timestamp")
+	}
+	if e.ReceivedAt == 0 {
+		missingParameters = append(missingParameters, "receivedAt")
+	}
+	return
+}

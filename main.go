@@ -53,6 +53,15 @@ func identifyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Input validation
+	missingParameters := event.Validate()
+	if len(missingParameters) != 0 {
+		msg := "Missing parameters: "
+		msg = msg + strings.Join(missingParameters, ", ") + "."
+		writeResponse(w, msg, http.StatusBadRequest)
+		return
+	}
+
 	// Yay, it worked so far, let's send all the things to integrations!
 	for _, integrationName := range integrations.IntegrationList() {
 		integration := integrations.GetIntegration(integrationName)
