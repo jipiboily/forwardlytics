@@ -4,7 +4,7 @@ Takes event in and forwards them to various places.
 
 You can send events to Forwardlytics, and it will forward it to many services like Intercom or Mixpanel.
 
-*THIS IS A VERY VERY EARLY NON WORKING VERSION*. Use at your own risk, or contribute :)
+**THIS IS A VERY VERY EARLY NON WORKING VERSION**. Use at your own risk, or contribute :)
 
 ## Installation
 
@@ -20,7 +20,7 @@ To send to Mixpanel:
 - set `MIXPANEL_TOKEN=abc`
 - set `MIXPANEL_API_KEY=123`
 
-Drip and Keen are probably going to be next.
+Drip and Keen.io are probably going to be next.
 
 ## Deployment
 
