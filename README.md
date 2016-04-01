@@ -6,6 +6,8 @@ You can send events to Forwardlytics, and it will forward it to many services li
 
 **THIS IS A VERY VERY EARLY NON WORKING VERSION**. Use at your own risk, or contribute :)
 
+[![Code Climate](https://codeclimate.com/github/jipiboily/forwardlytics/badges/gpa.svg)](https://codeclimate.com/github/jipiboily/forwardlytics)
+
 ## Installation
 
 - `go get github.com/jipiboily/forwardlytics`
