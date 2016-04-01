@@ -13,10 +13,15 @@ type Integration interface {
 
 // Event defines the structure of the data we receive from the API
 type Event struct {
-	UserID     string            `json:"userID"`
+	// Unique user ID. Should not change, ever.
+	UserID string `json:"userID"`
+	// Set of custom traits sent to the integrations. Some might be required, on
+	// a per integration basis.
 	UserTraits map[string]string `json:"userTraits"`
-	Timestamp  int64             `json:"timestamp"`
-	ReceivedAt int64             `json:"receivedAt"`
+	// Timestamp of when the event originally triggered
+	Timestamp int64 `json:"timestamp"`
+	// Timestamp of when Forwardlytics received the event.
+	ReceivedAt int64 `json:"receivedAt"`
 }
 
 // Validate the content of the event to be sure it has everything that's need
