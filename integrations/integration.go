@@ -27,8 +27,5 @@ func (e Event) Validate() (missingParameters []string) {
 	if e.Timestamp == 0 {
 		missingParameters = append(missingParameters, "timestamp")
 	}
-	if e.ReceivedAt == 0 {
-		missingParameters = append(missingParameters, "receivedAt")
-	}
 	return
 }
