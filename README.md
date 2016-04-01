@@ -52,3 +52,7 @@ If you want auto reloading, install https://github.com/codegangsta/gin and run:
 - `FORWARDLYTICS_API_KEY=somevalue gin -a 8080 -t .`
 
 You need to set environment variables for the integrations you want to work with.
+
+## Why?
+
+https://medium.com/@jipiboily/self-hosted-segment-equivalent-c81815e963df
