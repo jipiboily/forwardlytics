@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/jipiboily/forwardlytics/integrations"
 
@@ -28,6 +29,10 @@ func main() {
 }
 
 func identifyHandler(w http.ResponseWriter, r *http.Request) {
+	// This is the soonest we can do that, pretty much at least.
+	receivedAt := time.Now().Unix()
+
+	// This endpoint is a POST, everything else be a 404
 	if r.Method != "POST" {
 		http.NotFound(w, r)
 		return
@@ -52,6 +57,7 @@ func identifyHandler(w http.ResponseWriter, r *http.Request) {
 		writeResponse(w, "Invalid request.", http.StatusBadRequest)
 		return
 	}
+	event.ReceivedAt = receivedAt
 
 	// Input validation
 	missingParameters := event.Validate()
