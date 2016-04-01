@@ -13,8 +13,8 @@ type Intercom struct {
 }
 
 // Identify forwards and identify call to Intercom
-func (i Intercom) Identify(user integrations.User) (err error) {
-	log.Printf("NOT IMPLEMENTED: will send %#v to Intercom\n", user)
+func (i Intercom) Identify(event integrations.Event) (err error) {
+	log.Printf("NOT IMPLEMENTED: will send %#v to Intercom\n", event)
 
 	// what to do if there is an error? Log in BugSnag, but besides that....retry?
 	ic := intercom.NewClient(appID(), apiKey())

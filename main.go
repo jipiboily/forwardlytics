@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/jipiboily/forwardlytics/integrations"
 
@@ -32,6 +33,7 @@ func identifyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// API key validation. Should be moved to a middleware.
 	apiKey := r.Header.Get("FORWARDLYTICS_API_KEY")
 	if apiKey != os.Getenv("FORWARDLYTICS_API_KEY") {
 		log.Printf("Wrong API key. We had '%s' but it should be '%s'\n", apiKey, os.Getenv("FORWARDLYTICS_API_KEY"))
@@ -41,20 +43,22 @@ func identifyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Unmarshal input JSON
 	decoder := json.NewDecoder(r.Body)
-	var user integrations.User
-	err := decoder.Decode(&user)
+	var event integrations.Event
+	err := decoder.Decode(&event)
 	if err != nil {
 		log.Println("Bad request:", r.Body)
 		writeResponse(w, "Invalid request.", http.StatusBadRequest)
 		return
 	}
 
+	// Yay, it worked so far, let's send all the things to integrations!
 	for _, integrationName := range integrations.IntegrationList() {
 		integration := integrations.GetIntegration(integrationName)
 		if integration.Enabled() {
 			log.Println("Forwarding idenitify to", integrationName)
-			integration.Identify(user)
+			integration.Identify(event)
 		}
 
 	}

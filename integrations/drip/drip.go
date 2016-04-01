@@ -11,8 +11,8 @@ type Drip struct {
 }
 
 // Identify forwards and identify call to Drip.io
-func (Drip) Identify(user integrations.User) (err error) {
-	log.Printf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", user)
+func (Drip) Identify(event integrations.Event) (err error) {
+	log.Printf("NOT IMPLEMENTED: will send %#v to Drip\n", event)
 	return
 }
 

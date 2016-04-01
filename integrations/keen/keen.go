@@ -11,8 +11,8 @@ type Keen struct {
 }
 
 // Identify forwards and identify call to Keen.io
-func (Keen) Identify(user integrations.User) (err error) {
-	log.Printf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", user)
+func (Keen) Identify(event integrations.Event) (err error) {
+	log.Printf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", event)
 	return
 }
 
