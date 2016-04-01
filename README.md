@@ -50,6 +50,8 @@ For now, Forwardlytics supports only one project at a time. The configuration is
 - [ ] implement the Intercom integration
 - [ ] add tests for the plugin system, and everything else (why not before? This is a PoC, not sure the structure of the project and data will stay the same yet)
 - [ ] implement the Mixpanel integration
+- [ ] move the API key validation in a middleware
+- [ ] add `Track` to track events in integrations
 - [ ] document how to add an integration
 - [ ] implement the Ruby SDK (https://github.com/jipiboily/forwardlytics-ruby)
 - [ ] make it robust enough to use in small apps, that are not too critical to start with
