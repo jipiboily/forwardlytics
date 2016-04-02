@@ -73,7 +73,13 @@ func identifyHandler(w http.ResponseWriter, r *http.Request) {
 		integration := integrations.GetIntegration(integrationName)
 		if integration.Enabled() {
 			log.Println("Forwarding idenitify to", integrationName)
-			integration.Identify(event)
+			err := integration.Identify(event)
+			if err != nil {
+				errMsg := fmt.Sprintf("Fatal error during identification with an integration (%s): %s", integrationName, err)
+				log.Println(errMsg)
+				writeResponse(w, errMsg, 500)
+				return
+			}
 		}
 
 	}
