@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/intercom/intercom-go"
 	"github.com/jipiboily/forwardlytics/integrations"
-	"gopkg.in/intercom/intercom-go.v1"
 )
 
 // Intercom integration
@@ -16,14 +16,34 @@ type Intercom struct {
 func (i Intercom) Identify(event integrations.Event) (err error) {
 	log.Printf("NOT IMPLEMENTED: will send %#v to Intercom\n", event)
 
-	// what to do if there is an error? Log in BugSnag, but besides that....retry?
 	ic := intercom.NewClient(appID(), apiKey())
-	icUser, err := ic.Users.FindByEmail("z4@metrics.watch")
+	icUser, err := ic.Users.FindByUserID(event.UserID)
 	if err != nil {
-		log.Fatalf("Error fetching the user on Intercom: %s", err)
+		log.Println("Error fetching the Intercom user:", err)
+		return
 	}
-	log.Printf("User on Intercom: %#v\n", icUser)
 
+	icUser.CustomAttributes = event.UserTraits
+
+	if event.UserTraits["email"] != nil {
+		icUser.Email = event.UserTraits["email"].(string)
+	}
+
+	if event.UserTraits["name"] != nil {
+		icUser.Name = event.UserTraits["name"].(string)
+	}
+
+	if event.UserTraits["createdAt"] != nil {
+		icUser.CreatedAt = int32(event.UserTraits["createdAt"].(float64))
+		icUser.SignedUpAt = int32(event.UserTraits["createdAt"].(float64))
+	}
+
+	savedUser, err := ic.Users.Save(&icUser)
+	if err == nil {
+		log.Printf("User saved on Intercom: %#v\n", savedUser)
+	} else {
+		log.Println("Error while saving on Intercom:", err)
+	}
 	return
 }
 

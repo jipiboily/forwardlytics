@@ -17,7 +17,7 @@ type Event struct {
 	UserID string `json:"userID"`
 	// Set of custom traits sent to the integrations. Some might be required, on
 	// a per integration basis.
-	UserTraits map[string]string `json:"userTraits"`
+	UserTraits map[string]interface{} `json:"userTraits"`
 	// Timestamp of when the event originally triggered
 	Timestamp int64 `json:"timestamp"`
 	// Timestamp of when Forwardlytics received the event.
