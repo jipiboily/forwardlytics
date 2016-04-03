@@ -3,6 +3,7 @@ package intercom
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/intercom/intercom-go"
 	"github.com/jipiboily/forwardlytics/integrations"
@@ -10,17 +11,44 @@ import (
 
 // Intercom integration
 type Intercom struct {
+	*intercom.Client
+	Service
+}
+
+// Service defines the interface for working with the Intercom API
+type Service interface {
+	FindByUserID(userID string) (intercom.User, error)
+	Save(user intercom.User) (intercom.User, error)
+}
+
+// API implements IntercomService
+type API struct {
+	*intercom.Client
+}
+
+// FindByUserID will get the user by UserID on Intercom
+func (api API) FindByUserID(userID string) (user intercom.User, err error) {
+	user, err = api.Client.Users.FindByUserID(userID)
+	return
+}
+
+// Save will save the user on Intercom
+func (api API) Save(user intercom.User) (savedUser intercom.User, err error) {
+	savedUser, err = api.Client.Users.Save(&user)
+	return
 }
 
 // Identify forwards and identify call to Intercom
 func (i Intercom) Identify(event integrations.Event) (err error) {
-	log.Printf("NOT IMPLEMENTED: will send %#v to Intercom\n", event)
-
-	ic := intercom.NewClient(appID(), apiKey())
-	icUser, err := ic.Users.FindByUserID(event.UserID)
+	icUser, err := i.Service.FindByUserID(event.UserID)
 	if err != nil {
-		log.Println("Error fetching the Intercom user:", err)
-		return
+		if strings.Contains(err.Error(), "not_found") {
+			// The user doesn't exist, we just need to create it.
+			icUser = intercom.User{UserID: event.UserID}
+		} else {
+			log.Println("Error fetching the Intercom user:", err)
+			return
+		}
 	}
 
 	icUser.CustomAttributes = event.UserTraits
@@ -38,7 +66,7 @@ func (i Intercom) Identify(event integrations.Event) (err error) {
 		icUser.SignedUpAt = int32(event.UserTraits["createdAt"].(float64))
 	}
 
-	savedUser, err := ic.Users.Save(&icUser)
+	savedUser, err := i.Service.Save(icUser)
 	if err == nil {
 		log.Printf("User saved on Intercom: %#v\n", savedUser)
 	} else {
@@ -61,5 +89,8 @@ func appID() string {
 }
 
 func init() {
-	integrations.RegisterIntegration("intercom", Intercom{})
+	ic := Intercom{}
+	ic.Client = intercom.NewClient(appID(), apiKey())
+	ic.Service = API{ic.Client}
+	integrations.RegisterIntegration("intercom", ic)
 }
