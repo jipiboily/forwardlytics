@@ -47,6 +47,8 @@ See https://github.com/jipiboily/forwardlytics/blob/master/integrations/integrat
 
 ## Development
 
+Note that you should install [Godep](https://github.com/tools/godep) if you are going to add any dependency to this project.
+
 - `FORWARDLYTICS_API_KEY=somevalue go run main.go`
 
 If you want auto reloading, install https://github.com/codegangsta/gin and run:

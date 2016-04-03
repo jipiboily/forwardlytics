@@ -1,0 +1,21 @@
+{
+	"ImportPath": "github.com/jipiboily/forwardlytics",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v60",
+	"Deps": [
+		{
+			"ImportPath": "github.com/google/go-querystring/query",
+			"Rev": "6bb77fe6f42b85397288d4f6f67ac72f8f400ee7"
+		},
+		{
+			"ImportPath": "gopkg.in/intercom/intercom-go.v2",
+			"Comment": "v1.0.0-35-g95c8070",
+			"Rev": "95c8070886f9e0833ec6200fa19c45b43a7f131c"
+		},
+		{
+			"ImportPath": "gopkg.in/intercom/intercom-go.v2/interfaces",
+			"Comment": "v1.0.0-35-g95c8070",
+			"Rev": "95c8070886f9e0833ec6200fa19c45b43a7f131c"
+		}
+	]
+}
