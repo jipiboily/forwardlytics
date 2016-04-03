@@ -22,9 +22,13 @@ func main() {
 		log.Fatal("You need to set FORWARDLYTICS_API_KEY")
 	}
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
 	http.HandleFunc("/identify", identifyHandler)
-	log.Println("Forwardlytics started on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Forwardlytics started on port", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 
 }
 
