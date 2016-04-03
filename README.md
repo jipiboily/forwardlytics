@@ -28,9 +28,7 @@ Drip and Keen.io are probably going to be next.
 
 ## Deployment
 
-Make sure that everything goes through SSL.
-
-[TBD]
+Forwardlytics can be deployed to Heroku. You can setup the port it starts on by setting the `PORT` environment variable.
 
 ## Calling the API
 
