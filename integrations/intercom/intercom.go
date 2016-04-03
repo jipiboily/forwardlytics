@@ -26,13 +26,13 @@ type API struct {
 	*intercom.Client
 }
 
-// FindByUserID will get the user by UserID on Intercom
+// FindByUserID gets the user by UserID on Intercom
 func (api API) FindByUserID(userID string) (user intercom.User, err error) {
 	user, err = api.Client.Users.FindByUserID(userID)
 	return
 }
 
-// Save will save the user on Intercom
+// Save the user on Intercom
 func (api API) Save(user intercom.User) (savedUser intercom.User, err error) {
 	savedUser, err = api.Client.Users.Save(&user)
 	return
