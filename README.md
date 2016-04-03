@@ -30,6 +30,13 @@ Drip and Keen.io are probably going to be next.
 
 Forwardlytics can be deployed to Heroku. You can setup the port it starts on by setting the `PORT` environment variable.
 
+## You need an integration that doesn't exist yet?
+
+You have two options:
+
+- send a PR adding it.
+- get in touch to have it added by the author (for a fee).
+
 ## Calling the API
 
 cURL example:
