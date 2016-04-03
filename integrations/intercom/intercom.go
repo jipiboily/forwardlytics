@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/intercom/intercom-go"
 	"github.com/jipiboily/forwardlytics/integrations"
+	intercom "gopkg.in/intercom/intercom-go.v2"
 )
 
 // Intercom integration
@@ -62,8 +62,9 @@ func (i Intercom) Identify(event integrations.Event) (err error) {
 	}
 
 	if event.UserTraits["createdAt"] != nil {
-		icUser.CreatedAt = int32(event.UserTraits["createdAt"].(float64))
-		icUser.SignedUpAt = int32(event.UserTraits["createdAt"].(float64))
+		// TODO: this is horrible, there must be a better way...
+		icUser.CreatedAt = int64(event.UserTraits["createdAt"].(float64))
+		icUser.SignedUpAt = int64(event.UserTraits["createdAt"].(float64))
 	}
 
 	savedUser, err := i.Service.Save(icUser)

@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/intercom/intercom-go"
 	"github.com/jipiboily/forwardlytics/integrations"
+	intercom "gopkg.in/intercom/intercom-go.v2"
 )
 
 func TestIdentifySuccessWhenCreate(t *testing.T) {
