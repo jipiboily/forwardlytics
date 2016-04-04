@@ -9,12 +9,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jipiboily/forwardlytics/integrations"
+	"github.com/jipiboily/dickspatch/integrations"
 
-	_ "github.com/jipiboily/forwardlytics/integrations/drip"
-	_ "github.com/jipiboily/forwardlytics/integrations/intercom"
-	_ "github.com/jipiboily/forwardlytics/integrations/keen"
-	_ "github.com/jipiboily/forwardlytics/integrations/mixpanel"
+	_ "github.com/jipiboily/dickspatch/integrations/drip"
+	_ "github.com/jipiboily/dickspatch/integrations/intercom"
+	_ "github.com/jipiboily/dickspatch/integrations/keen"
+	_ "github.com/jipiboily/dickspatch/integrations/mixpanel"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/jipiboily/forwardlytics/integrations"
+	"github.com/jipiboily/dickspatch/integrations"
 	intercom "gopkg.in/intercom/intercom-go.v2"
 )
 

@@ -3,7 +3,7 @@ package keen
 import (
 	"log"
 
-	"github.com/jipiboily/forwardlytics/integrations"
+	"github.com/jipiboily/dickspatch/integrations"
 )
 
 // Keen integration

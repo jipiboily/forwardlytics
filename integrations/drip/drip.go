@@ -3,7 +3,7 @@ package drip
 import (
 	"log"
 
-	"github.com/jipiboily/forwardlytics/integrations"
+	"github.com/jipiboily/dickspatch/integrations"
 )
 
 // Drip integration
