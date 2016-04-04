@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/jipiboily/forwardlytics",
+	"ImportPath": "github.com/jipiboily/dickspatch",
 	"GoVersion": "go1.6",
 	"GodepVersion": "v60",
 	"Deps": [

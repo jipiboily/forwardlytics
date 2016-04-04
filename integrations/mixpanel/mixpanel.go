@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/jipiboily/forwardlytics/integrations"
+	"github.com/jipiboily/dickspatch/integrations"
 )
 
 // Mixpanel integration

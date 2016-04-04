@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jipiboily/forwardlytics/integrations"
+	"github.com/jipiboily/dickspatch/integrations"
 	intercom "gopkg.in/intercom/intercom-go.v2"
 )
 

@@ -6,13 +6,13 @@ You can send events to Forwardlytics, and it will forward it to many services li
 
 **THIS IS A VERY VERY EARLY NON WORKING VERSION**. Use at your own risk, or contribute :)
 
-Where are we at? What needs to be done and what's in the pipeline? See https://waffle.io/jipiboily/forwardlytics
+Where are we at? What needs to be done and what's in the pipeline? See https://waffle.io/jipiboily/dickspatch
 
-[![Build Status](https://travis-ci.org/jipiboily/forwardlytics.svg?branch=master)](https://travis-ci.org/jipiboily/forwardlytics)
+[![Build Status](https://travis-ci.org/jipiboily/dickspatch.svg?branch=master)](https://travis-ci.org/jipiboily/dickspatch)
 
 ## Installation
 
-- `go get github.com/jipiboily/forwardlytics`
+- `go get github.com/jipiboily/dickspatch`
 
 - set `FORWARDLYTICS_API_KEY=SOMETHING_YOU_DECIDE_AND_NO_ONE_CAN_GUESS`
 
@@ -48,7 +48,7 @@ curl --request POST \
 -d '{"userID":"123", "userTraits":{"number_of_things":"42"},"timestamp":1459532831}' http://localhost:3000/identify
 ```
 
-See https://github.com/jipiboily/forwardlytics/blob/master/integrations/integration.go for details of what is accepted by the API.
+See https://github.com/jipiboily/dickspatch/blob/master/integrations/integration.go for details of what is accepted by the API.
 
 ## Development
 
