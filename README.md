@@ -9,7 +9,7 @@ You can send events to Forwardlytics, and it will forward it to many services li
 Where are we at? What needs to be done and what's in the pipeline? See [Forawrdlytics on waffle.io][forwardlytics-on-waffle]
 
 [![Build Status](https://travis-ci.org/jipiboily/forwardlytics.svg?branch=master)](https://travis-ci.org/jipiboily/forwardlytics)
-[![Stories in Progress](https://badge.waffle.io/jipiboily/forwardlytics.svg?label=waffle%3Ain%20progress&title=In%20Progress)](http://waffle.io/jipiboily/forwardlytics)
+[![Stories in Progress](https://badge.waffle.io/jipiboily/forwardlytics.svg?label=In%20Progress&title=In%20Progress)](http://waffle.io/jipiboily/forwardlytics)
 
 ## Installation
 
