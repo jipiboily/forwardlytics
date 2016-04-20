@@ -1,4 +1,4 @@
-# Forwardlytics
+<h1><center><img src="https://s3.amazonaws.com/forwardlytics-assets/logo-color.svg"></center></h1>
 
 Takes event in and forwards them to various places.
 
@@ -75,3 +75,7 @@ You need to set environment variables for the integrations you want to work with
 [codegangsta/gin]: https://github.com/codegangsta/gin
 [https://github.com/tools/godep]: https://github.com/tools/godep
 [self-hosted-segment-equivalent]: https://medium.com/@jipiboily/self-hosted-segment-equivalent-c81815e963df
+
+## Thanks!
+
+Thanks to my friend <a href="https://twitter.com/juliandoesstuff" target="_blank">Julian</a> for the logo! :grinning:
