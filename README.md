@@ -1,4 +1,6 @@
-<h1><center><img src="https://s3.amazonaws.com/forwardlytics-assets/logo-color.svg"></center></h1>
+<p align="center">
+  <img src="https://s3.amazonaws.com/forwardlytics-assets/logo-color.svg">
+</p>
 
 Takes event in and forwards them to various places.
 
