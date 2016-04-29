@@ -21,7 +21,8 @@ func main() {
 	if port == "" {
 		port = "3000"
 	}
-	http.HandleFunc("/identify", handlers.Identify)
+
+	http.Handle("/identify", handlers.AuthMiddleware(http.HandlerFunc(handlers.Identify)))
 	log.Println("Forwardlytics started on port", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
