@@ -12,8 +12,8 @@ type Mixpanel struct {
 }
 
 // Identify forwards and identify call to Mixpanel
-func (Mixpanel) Identify(event integrations.Event) (err error) {
-	log.Printf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", event)
+func (Mixpanel) Identify(identification integrations.Identification) (err error) {
+	log.Printf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", identification)
 	return
 }
 

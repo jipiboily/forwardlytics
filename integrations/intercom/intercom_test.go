@@ -14,7 +14,7 @@ func TestIdentifySuccessWhenCreate(t *testing.T) {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
 	ic.Service = FakeIntercomAPIWhenCreate{t: t}
-	event := integrations.Event{
+	identification := integrations.Identification{
 		UserID: "123",
 		UserTraits: map[string]interface{}{
 			"name":      "John Doe",
@@ -22,7 +22,7 @@ func TestIdentifySuccessWhenCreate(t *testing.T) {
 			"createdAt": float64(123),
 		},
 	}
-	err := ic.Identify(event)
+	err := ic.Identify(identification)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func TestIdentifySuccessWhenUpdate(t *testing.T) {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
 	ic.Service = FakeIntercomAPISuccess{t: t}
-	event := integrations.Event{
+	identification := integrations.Identification{
 		UserID: "123",
 		UserTraits: map[string]interface{}{
 			"name":      "John Doe",
@@ -40,7 +40,7 @@ func TestIdentifySuccessWhenUpdate(t *testing.T) {
 			"createdAt": float64(123),
 		},
 	}
-	err := ic.Identify(event)
+	err := ic.Identify(identification)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +50,7 @@ func TestIdentifyWhenFail(t *testing.T) {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
 	ic.Service = FakeIntercomAPIFailSave{}
-	err := ic.Identify(integrations.Event{})
+	err := ic.Identify(integrations.Identification{})
 	if err == nil {
 		t.Fatal("Expecting an error.")
 	}

@@ -11,8 +11,8 @@ type Drip struct {
 }
 
 // Identify forwards and identify call to Drip.io
-func (Drip) Identify(event integrations.Event) (err error) {
-	log.Printf("NOT IMPLEMENTED: will send %#v to Drip\n", event)
+func (Drip) Identify(identification integrations.Identification) (err error) {
+	log.Printf("NOT IMPLEMENTED: will send %#v to Drip\n", identification)
 	return
 }
 

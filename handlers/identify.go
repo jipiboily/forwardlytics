@@ -23,17 +23,17 @@ func Identify(w http.ResponseWriter, r *http.Request) {
 
 	// Unmarshal input JSON
 	decoder := json.NewDecoder(r.Body)
-	var event integrations.Event
-	err := decoder.Decode(&event)
+	var identification integrations.Identification
+	err := decoder.Decode(&identification)
 	if err != nil {
 		log.Println("Bad request:", r.Body)
 		writeResponse(w, "Invalid request.", http.StatusBadRequest)
 		return
 	}
-	event.ReceivedAt = receivedAt
+	identification.ReceivedAt = receivedAt
 
 	// Input validation
-	missingParameters := event.Validate()
+	missingParameters := identification.Validate()
 	if len(missingParameters) != 0 {
 		msg := "Missing parameters: "
 		msg = msg + strings.Join(missingParameters, ", ") + "."
@@ -46,7 +46,7 @@ func Identify(w http.ResponseWriter, r *http.Request) {
 		integration := integrations.GetIntegration(integrationName)
 		if integration.Enabled() {
 			log.Println("Forwarding idenitify to", integrationName)
-			err := integration.Identify(event)
+			err := integration.Identify(identification)
 			if err != nil {
 				errMsg := fmt.Sprintf("Fatal error during identification with an integration (%s): %s", integrationName, err)
 				log.Println(errMsg)
