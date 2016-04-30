@@ -39,32 +39,32 @@ func (api API) Save(user intercom.User) (savedUser intercom.User, err error) {
 }
 
 // Identify forwards and identify call to Intercom
-func (i Intercom) Identify(event integrations.Event) (err error) {
-	icUser, err := i.Service.FindByUserID(event.UserID)
+func (i Intercom) Identify(identification integrations.Identification) (err error) {
+	icUser, err := i.Service.FindByUserID(identification.UserID)
 	if err != nil {
 		if strings.Contains(err.Error(), "not_found") {
 			// The user doesn't exist, we just need to create it.
-			icUser = intercom.User{UserID: event.UserID}
+			icUser = intercom.User{UserID: identification.UserID}
 		} else {
 			log.Println("Error fetching the Intercom user:", err)
 			return
 		}
 	}
 
-	icUser.CustomAttributes = event.UserTraits
+	icUser.CustomAttributes = identification.UserTraits
 
-	if event.UserTraits["email"] != nil {
-		icUser.Email = event.UserTraits["email"].(string)
+	if identification.UserTraits["email"] != nil {
+		icUser.Email = identification.UserTraits["email"].(string)
 	}
 
-	if event.UserTraits["name"] != nil {
-		icUser.Name = event.UserTraits["name"].(string)
+	if identification.UserTraits["name"] != nil {
+		icUser.Name = identification.UserTraits["name"].(string)
 	}
 
-	if event.UserTraits["createdAt"] != nil {
+	if identification.UserTraits["createdAt"] != nil {
 		// TODO: this is horrible, there must be a better way...
-		icUser.CreatedAt = int64(event.UserTraits["createdAt"].(float64))
-		icUser.SignedUpAt = int64(event.UserTraits["createdAt"].(float64))
+		icUser.CreatedAt = int64(identification.UserTraits["createdAt"].(float64))
+		icUser.SignedUpAt = int64(identification.UserTraits["createdAt"].(float64))
 	}
 
 	savedUser, err := i.Service.Save(icUser)
