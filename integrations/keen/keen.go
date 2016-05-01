@@ -16,6 +16,12 @@ func (Keen) Identify(identification integrations.Identification) (err error) {
 	return
 }
 
+// Track forwards the event to Keen
+func (Keen) Track(event integrations.Event) (err error) {
+	log.Printf("NOT IMPLEMENTED: will send %#v to Keen\n", event)
+	return
+}
+
 // Enabled returns wether or not the Keen.io integration is enabled/configured
 func (Keen) Enabled() bool {
 	return false

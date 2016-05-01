@@ -1,7 +1,9 @@
 package integrations
 
 import (
+	"log"
 	"sort"
+	"strings"
 	"sync"
 )
 
@@ -41,4 +43,14 @@ func IntegrationList() []string {
 	}
 	sort.Strings(list)
 	return list
+}
+
+// RemoveIntegration is ONLY used for tests, to be able remove a test integration
+func RemoveIntegration(name string) {
+	if !strings.HasPrefix(name, "test-only-integration-") {
+		log.Fatal("THIS IS ONLY FOR TESTING!!")
+	}
+	integrationsMu.Lock()
+	defer integrationsMu.Unlock()
+	delete(integrations, name)
 }

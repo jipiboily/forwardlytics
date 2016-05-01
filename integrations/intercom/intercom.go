@@ -1,6 +1,7 @@
 package intercom
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -73,6 +74,12 @@ func (i Intercom) Identify(identification integrations.Identification) (err erro
 	} else {
 		log.Println("Error while saving on Intercom:", err)
 	}
+	return
+}
+
+// Track forwards the event to Intercom
+func (i Intercom) Track(event integrations.Event) (err error) {
+	fmt.Println("IN TRACK (Intercom)!!!", event)
 	return
 }
 

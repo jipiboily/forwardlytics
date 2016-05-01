@@ -7,6 +7,9 @@ type Integration interface {
 	// Identify is responsible of forwarding the identify call to the integration
 	Identify(identification Identification) error
 
+	// Track forwards the event to the integration
+	Track(event Event) error
+
 	// Enabled returns wether or not the integration is enabled/configured
 	Enabled() bool
 }
@@ -15,11 +18,14 @@ type Integration interface {
 type Identification struct {
 	// Unique user ID. Should not change, ever.
 	UserID string `json:"userID"`
+
 	// Set of custom traits sent to the integrations. Some might be required, on
 	// a per integration basis.
 	UserTraits map[string]interface{} `json:"userTraits"`
+
 	// Timestamp of when the identifiaction originally triggered
 	Timestamp int64 `json:"timestamp"`
+
 	// Timestamp of when Forwardlytics received the identifiaction.
 	ReceivedAt int64 `json:"receivedAt"`
 }
@@ -31,6 +37,39 @@ func (i Identification) Validate() (missingParameters []string) {
 	}
 
 	if i.Timestamp == 0 {
+		missingParameters = append(missingParameters, "timestamp")
+	}
+	return
+}
+
+type Event struct {
+	// Name is the name of the event
+	Name string `json:"name"`
+
+	// Unique user ID. Should not change, ever.
+	UserID string `json:"userID"`
+
+	// Properties are custom variables you can send with the event
+	Properties map[string]interface{} `json:"properties"`
+
+	// Timestamp of when the identifiaction originally triggered
+	Timestamp int64 `json:"timestamp"`
+
+	// Timestamp of when Forwardlytics received the identifiaction.
+	ReceivedAt int64 `json:"receivedAt"`
+}
+
+// Validate the content of the event to be sure it has everything that's needed
+func (e Event) Validate() (missingParameters []string) {
+	if e.Name == "" {
+		missingParameters = append(missingParameters, "name")
+	}
+
+	if e.UserID == "" {
+		missingParameters = append(missingParameters, "userID")
+	}
+
+	if e.Timestamp == 0 {
 		missingParameters = append(missingParameters, "timestamp")
 	}
 	return
