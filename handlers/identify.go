@@ -11,6 +11,7 @@ import (
 	"github.com/jipiboily/forwardlytics/integrations"
 )
 
+// Identify is taking an identification to send it to the enabled integrations
 func Identify(w http.ResponseWriter, r *http.Request) {
 	// This is the soonest we can do that, pretty much at least.
 	receivedAt := time.Now().Unix()

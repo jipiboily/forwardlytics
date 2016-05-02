@@ -2,6 +2,7 @@ package handlers
 
 import "github.com/jipiboily/forwardlytics/integrations"
 
+// FakeIntegration is the base of a fake integration, used for testing.
 type FakeIntegration struct {
 }
 

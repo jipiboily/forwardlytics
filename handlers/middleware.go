@@ -5,6 +5,8 @@ import (
 	"os"
 )
 
+// AuthMiddleware is making sure the call is properly authenticated before
+// sending the request to the handlers
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apiKey := r.Header.Get("FORWARDLYTICS_API_KEY")
