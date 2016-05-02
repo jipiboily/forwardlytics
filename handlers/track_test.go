@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -135,7 +134,6 @@ func TestTrackWhenValid(t *testing.T) {
 	Track(w, r)
 
 	if !integration.Tracked {
-		fmt.Println(integration.Tracked)
 		t.Error("Track was not called on the integration")
 	}
 
