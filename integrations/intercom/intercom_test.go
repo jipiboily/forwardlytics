@@ -13,7 +13,8 @@ import (
 func TestIdentifySuccessWhenCreate(t *testing.T) {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
-	ic.Service = FakeIntercomAPIWhenCreate{t: t}
+	service := &FakeIntercomAPIWhenCreate{t: t}
+	ic.Service = service
 	identification := integrations.Identification{
 		UserID: "123",
 		UserTraits: map[string]interface{}{
@@ -22,16 +23,22 @@ func TestIdentifySuccessWhenCreate(t *testing.T) {
 			"createdAt": float64(123),
 		},
 	}
+
 	err := ic.Identify(identification)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if !service.SaveCalled {
+		t.Error("Save was NOT called on the event")
 	}
 }
 
 func TestIdentifySuccessWhenUpdate(t *testing.T) {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
-	ic.Service = FakeIntercomAPISuccess{t: t}
+	service := &FakeIntercomAPISuccess{t: t}
+	ic.Service = service
 	identification := integrations.Identification{
 		UserID: "123",
 		UserTraits: map[string]interface{}{
@@ -40,19 +47,29 @@ func TestIdentifySuccessWhenUpdate(t *testing.T) {
 			"createdAt": float64(123),
 		},
 	}
+
 	err := ic.Identify(identification)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if !service.SaveCalled {
+		t.Error("Save was NOT called on the event")
 	}
 }
 
 func TestIdentifyWhenFail(t *testing.T) {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
-	ic.Service = FakeIntercomAPIFailSave{}
+	service := &FakeIntercomAPIFailSave{}
+	ic.Service = service
 	err := ic.Identify(integrations.Identification{})
 	if err == nil {
 		t.Fatal("Expecting an error.")
+	}
+
+	if !service.SaveCalled {
+		t.Error("Save was NOT called on the event")
 	}
 }
 
@@ -135,14 +152,16 @@ func TestEnabledWhenNotConfigured(t *testing.T) {
 }
 
 type FakeIntercomAPISuccess struct {
-	t *testing.T
+	t          *testing.T
+	SaveCalled bool
 }
 
 func (api FakeIntercomAPISuccess) FindByUserID(userID string) (user intercom.User, err error) {
 	return
 }
 
-func (api FakeIntercomAPISuccess) Save(user intercom.User) (savedUser intercom.User, err error) {
+func (api *FakeIntercomAPISuccess) Save(user intercom.User) (savedUser intercom.User, err error) {
+	api.SaveCalled = true
 	expectedUser := intercom.User{
 		Name:       "John Doe",
 		Email:      "john@example.com",
@@ -162,9 +181,11 @@ func (api FakeIntercomAPISuccess) Save(user intercom.User) (savedUser intercom.U
 
 type FakeIntercomAPIFailSave struct {
 	FakeIntercomAPISuccess
+	SaveCalled bool
 }
 
-func (api FakeIntercomAPIFailSave) Save(user intercom.User) (savedUser intercom.User, err error) {
+func (api *FakeIntercomAPIFailSave) Save(user intercom.User) (savedUser intercom.User, err error) {
+	api.SaveCalled = true
 	err = errors.New("Some API error")
 	return
 }
@@ -172,6 +193,7 @@ func (api FakeIntercomAPIFailSave) Save(user intercom.User) (savedUser intercom.
 type FakeIntercomAPIWhenCreate struct {
 	t *testing.T
 	FakeIntercomAPISuccess
+	SaveCalled bool
 }
 
 func (api FakeIntercomAPIWhenCreate) FindByUserID(userID string) (user intercom.User, err error) {
@@ -179,7 +201,8 @@ func (api FakeIntercomAPIWhenCreate) FindByUserID(userID string) (user intercom.
 	return
 }
 
-func (api FakeIntercomAPIWhenCreate) Save(user intercom.User) (savedUser intercom.User, err error) {
+func (api *FakeIntercomAPIWhenCreate) Save(user intercom.User) (savedUser intercom.User, err error) {
+	api.SaveCalled = true
 	expectedUser := intercom.User{
 		UserID:     "123",
 		Name:       "John Doe",

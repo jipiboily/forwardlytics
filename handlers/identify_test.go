@@ -11,7 +11,7 @@ import (
 	"github.com/jipiboily/forwardlytics/integrations"
 )
 
-func TestTrackWhenNotPOST(t *testing.T) {
+func TestIdentifyWhenNotPOST(t *testing.T) {
 	expectedStatusCode := 404
 	expectedBody := "404 page not found"
 
@@ -21,7 +21,7 @@ func TestTrackWhenNotPOST(t *testing.T) {
 	}
 	w := httptest.NewRecorder()
 
-	Track(w, r)
+	Identify(w, r)
 
 	if w.Code != expectedStatusCode {
 		t.Errorf("Wrong status code. Expecting %v but got %v", expectedStatusCode, w.Code)
@@ -32,7 +32,7 @@ func TestTrackWhenNotPOST(t *testing.T) {
 	}
 }
 
-func TestTrackWhenInvalidJSON(t *testing.T) {
+func TestIdentifyWhenInvalidJSON(t *testing.T) {
 	expectedStatusCode := 400
 	expectedBody := `{"message": "Invalid request."}`
 
@@ -43,7 +43,7 @@ func TestTrackWhenInvalidJSON(t *testing.T) {
 	}
 	w := httptest.NewRecorder()
 
-	Track(w, r)
+	Identify(w, r)
 
 	if w.Code != expectedStatusCode {
 		t.Errorf("Wrong status code. Expecting %v but got %v", expectedStatusCode, w.Code)
@@ -54,9 +54,9 @@ func TestTrackWhenInvalidJSON(t *testing.T) {
 	}
 }
 
-func TestTrackWhenMissingParameter(t *testing.T) {
+func TestIdentifyWhenMissingParameter(t *testing.T) {
 	expectedStatusCode := 400
-	expectedBody := `{"message": "Missing parameters: name, userID, timestamp."}`
+	expectedBody := `{"message": "Missing parameters: userID, timestamp."}`
 
 	requestBody := `{}`
 	r, err := http.NewRequest("POST", "/track", strings.NewReader(requestBody))
@@ -65,7 +65,7 @@ func TestTrackWhenMissingParameter(t *testing.T) {
 	}
 	w := httptest.NewRecorder()
 
-	Track(w, r)
+	Identify(w, r)
 
 	if w.Code != expectedStatusCode {
 		t.Errorf("Wrong status code. Expecting %v but got %v", expectedStatusCode, w.Code)
@@ -76,9 +76,9 @@ func TestTrackWhenMissingParameter(t *testing.T) {
 	}
 }
 
-func TestTrackWhenOneIntegrationFails(t *testing.T) {
+func TestIdentifyWhenOneIntegrationFails(t *testing.T) {
 	expectedStatusCode := 500
-	expectedBody := `{"message": "Fatal error during event with an integration (test-only-integration-failing): some random error"}`
+	expectedBody := `{"message": "Fatal error during identification with an integration (test-only-integration-failing): some random error"}`
 
 	requestBody := `{
 		"name":"something.created",
@@ -92,7 +92,7 @@ func TestTrackWhenOneIntegrationFails(t *testing.T) {
 	}
 	w := httptest.NewRecorder()
 
-	failingIntegration := FailingIntegrationTrack{}
+	failingIntegration := FailingIntegrationIdentification{}
 	integrations.RegisterIntegration("test-only-integration-failing", failingIntegration)
 	defer integrations.RemoveIntegration("test-only-integration-failing")
 
@@ -100,7 +100,7 @@ func TestTrackWhenOneIntegrationFails(t *testing.T) {
 	integrations.RegisterIntegration("test-only-integration-working", workingIntegration)
 	defer integrations.RemoveIntegration("test-only-integration-working")
 
-	Track(w, r)
+	Identify(w, r)
 
 	if w.Code != expectedStatusCode {
 		t.Errorf("Wrong status code. Expecting %v but got %v", expectedStatusCode, w.Code)
@@ -111,9 +111,9 @@ func TestTrackWhenOneIntegrationFails(t *testing.T) {
 	}
 }
 
-func TestTrackWhenValid(t *testing.T) {
+func TestIdentifyWhenValid(t *testing.T) {
 	expectedStatusCode := 200
-	expectedBody := `{"message": "Forwarding event to integrations."}`
+	expectedBody := `{"message": "Forwarding identify to integrations."}`
 
 	requestBody := `{
 		"name":"something.created",
@@ -127,14 +127,14 @@ func TestTrackWhenValid(t *testing.T) {
 	}
 	w := httptest.NewRecorder()
 
-	integration := &CalledIntegration{t: t}
+	integration := &CalledIntegrationIdentify{t: t}
 	integrations.RegisterIntegration("test-only-integration-called", integration)
 	defer integrations.RemoveIntegration("test-only-integration-called")
 
-	Track(w, r)
+	Identify(w, r)
 
-	if !integration.Tracked {
-		t.Error("Track was not called on the integration")
+	if !integration.Identified {
+		t.Error("Identify was not called on the integration")
 	}
 
 	if w.Code != expectedStatusCode {
@@ -146,38 +146,38 @@ func TestTrackWhenValid(t *testing.T) {
 	}
 }
 
-// FailingIntegrationTrack is an integration that fails when called
-type FailingIntegrationTrack struct {
+// FailingIntegrationIdentification is an integration that fails when called
+type FailingIntegrationIdentification struct {
 	FakeIntegration
 }
 
-// Track is failing in this case
-func (fi FailingIntegrationTrack) Track(event integrations.Event) error {
+// Identify is failing in this case
+func (fi FailingIntegrationIdentification) Identify(identification integrations.Identification) error {
 	return errors.New("some random error")
 }
 
 // Enabled returns true because this failing integraiton is enabled
-func (FailingIntegrationTrack) Enabled() bool {
+func (FailingIntegrationIdentification) Enabled() bool {
 	return true
 }
 
-type CalledIntegration struct {
+type CalledIntegrationIdentify struct {
 	FakeIntegration
-	Tracked bool
-	t       *testing.T
+	Identified bool
+	t          *testing.T
 }
 
-func (i *CalledIntegration) Track(event integrations.Event) error {
-	i.Tracked = true
+func (i *CalledIntegrationIdentify) Identify(identification integrations.Identification) error {
+	i.Identified = true
 
 	expectedReceivedAtCloseTo := time.Now().Unix() - 5
-	if event.ReceivedAt < expectedReceivedAtCloseTo {
-		i.t.Errorf("ReceivedAt looks wrong. Expecting something close to %v but got %v", expectedReceivedAtCloseTo, event.ReceivedAt)
+	if identification.ReceivedAt < expectedReceivedAtCloseTo {
+		i.t.Errorf("ReceivedAt looks wrong. Expecting something close to %v but got %v", expectedReceivedAtCloseTo, identification.ReceivedAt)
 	}
 
 	return nil
 }
 
-func (i CalledIntegration) Enabled() bool {
+func (i CalledIntegrationIdentify) Enabled() bool {
 	return true
 }
