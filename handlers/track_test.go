@@ -112,21 +112,6 @@ func TestTrackWhenOneIntegrationFails(t *testing.T) {
 	}
 }
 
-// FailingIntegration is an integration that fails when called
-type FailingIntegration struct {
-	FakeIntegration
-}
-
-// Track is failing in this case
-func (fi FailingIntegration) Track(event integrations.Event) error {
-	return errors.New("some random error")
-}
-
-// Enabled returns true because this failing integraiton is enabled
-func (FailingIntegration) Enabled() bool {
-	return true
-}
-
 func TestTrackWhenValid(t *testing.T) {
 	expectedStatusCode := 200
 	expectedBody := `{"message": "Forwarding event to integrations."}`
@@ -161,6 +146,21 @@ func TestTrackWhenValid(t *testing.T) {
 	if !strings.Contains(w.Body.String(), expectedBody) {
 		t.Errorf(`Wrong response. Expecting "%s" but got "%s"`, expectedBody, w.Body.String())
 	}
+}
+
+// FailingIntegration is an integration that fails when called
+type FailingIntegration struct {
+	FakeIntegration
+}
+
+// Track is failing in this case
+func (fi FailingIntegration) Track(event integrations.Event) error {
+	return errors.New("some random error")
+}
+
+// Enabled returns true because this failing integraiton is enabled
+func (FailingIntegration) Enabled() bool {
+	return true
 }
 
 type CalledIntegration struct {
