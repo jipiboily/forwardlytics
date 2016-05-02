@@ -23,6 +23,7 @@ func main() {
 	}
 
 	http.Handle("/identify", handlers.AuthMiddleware(http.HandlerFunc(handlers.Identify)))
+	http.Handle("/track", handlers.AuthMiddleware(http.HandlerFunc(handlers.Track)))
 	log.Println("Forwardlytics started on port", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

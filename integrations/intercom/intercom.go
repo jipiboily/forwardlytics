@@ -13,29 +13,7 @@ import (
 type Intercom struct {
 	*intercom.Client
 	Service
-}
-
-// Service defines the interface for working with the Intercom API
-type Service interface {
-	FindByUserID(userID string) (intercom.User, error)
-	Save(user intercom.User) (intercom.User, error)
-}
-
-// API implements IntercomService
-type API struct {
-	*intercom.Client
-}
-
-// FindByUserID gets the user by UserID on Intercom
-func (api API) FindByUserID(userID string) (user intercom.User, err error) {
-	user, err = api.Client.Users.FindByUserID(userID)
-	return
-}
-
-// Save the user on Intercom
-func (api API) Save(user intercom.User) (savedUser intercom.User, err error) {
-	savedUser, err = api.Client.Users.Save(&user)
-	return
+	EventRepository
 }
 
 // Identify forwards and identify call to Intercom
@@ -76,9 +54,65 @@ func (i Intercom) Identify(identification integrations.Identification) (err erro
 	return
 }
 
+// Track forwards the event to Intercom
+func (i Intercom) Track(event integrations.Event) (err error) {
+	icEvent := intercom.Event{}
+	icEvent.UserID = event.UserID
+	icEvent.EventName = event.Name
+	icEvent.CreatedAt = event.Timestamp
+	icEvent.Metadata = event.Properties
+	if event.Properties["email"] != nil {
+		icEvent.Email = event.Properties["email"].(string)
+	}
+
+	err = i.EventRepository.Save(&icEvent)
+	if err != nil {
+		log.Println("Error while saving event on Intercom:", err)
+	}
+	return
+}
+
 // Enabled returns wether or not the Intercom integration is enabled/configured
 func (i Intercom) Enabled() bool {
 	return apiKey() != "" && appID() != ""
+}
+
+// EventRepository defines the interface for tracking events on Intercom
+type EventRepository interface {
+	Save(event *intercom.Event) error
+}
+
+// EventService tracks services on Intercom
+type EventService struct {
+	*intercom.Client
+}
+
+// Save the event on Intercom
+func (es EventService) Save(event *intercom.Event) error {
+	return es.Client.Events.Save(event)
+}
+
+// Service defines the interface for working with the Intercom API
+type Service interface {
+	FindByUserID(userID string) (intercom.User, error)
+	Save(user intercom.User) (intercom.User, error)
+}
+
+// API implements IntercomService
+type API struct {
+	*intercom.Client
+}
+
+// FindByUserID gets the user by UserID on Intercom
+func (api API) FindByUserID(userID string) (user intercom.User, err error) {
+	user, err = api.Client.Users.FindByUserID(userID)
+	return
+}
+
+// Save the user on Intercom
+func (api API) Save(user intercom.User) (savedUser intercom.User, err error) {
+	savedUser, err = api.Client.Users.Save(&user)
+	return
 }
 
 func apiKey() string {
@@ -93,5 +127,10 @@ func init() {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient(appID(), apiKey())
 	ic.Service = API{ic.Client}
+	ic.EventRepository = EventService{ic.Client}
+
+	// Useful for debugging, keeping it around to avoid remembering how to use it
+	// ic.Client.Option(intercom.TraceHTTP(true))
+
 	integrations.RegisterIntegration("intercom", ic)
 }

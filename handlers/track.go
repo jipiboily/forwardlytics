@@ -11,8 +11,8 @@ import (
 	"github.com/jipiboily/forwardlytics/integrations"
 )
 
-// Identify is taking an identification to send it to the enabled integrations
-func Identify(w http.ResponseWriter, r *http.Request) {
+// Track is taking an event to send it to the enabled integrations
+func Track(w http.ResponseWriter, r *http.Request) {
 	// This is the soonest we can do that, pretty much at least.
 	receivedAt := time.Now().Unix()
 
@@ -24,17 +24,17 @@ func Identify(w http.ResponseWriter, r *http.Request) {
 
 	// Unmarshal input JSON
 	decoder := json.NewDecoder(r.Body)
-	var identification integrations.Identification
-	err := decoder.Decode(&identification)
+	var event integrations.Event
+	err := decoder.Decode(&event)
 	if err != nil {
 		log.Println("Bad request:", r.Body)
 		writeResponse(w, "Invalid request.", http.StatusBadRequest)
 		return
 	}
-	identification.ReceivedAt = receivedAt
+	event.ReceivedAt = receivedAt
 
 	// Input validation
-	missingParameters := identification.Validate()
+	missingParameters := event.Validate()
 	if len(missingParameters) != 0 {
 		msg := "Missing parameters: "
 		msg = msg + strings.Join(missingParameters, ", ") + "."
@@ -46,10 +46,10 @@ func Identify(w http.ResponseWriter, r *http.Request) {
 	for _, integrationName := range integrations.IntegrationList() {
 		integration := integrations.GetIntegration(integrationName)
 		if integration.Enabled() {
-			log.Println("Forwarding idenitify to", integrationName)
-			err := integration.Identify(identification)
+			log.Println("Forwarding event to", integrationName)
+			err := integration.Track(event)
 			if err != nil {
-				errMsg := fmt.Sprintf("Fatal error during identification with an integration (%s): %s", integrationName, err)
+				errMsg := fmt.Sprintf("Fatal error during event with an integration (%s): %s", integrationName, err)
 				log.Println(errMsg)
 				writeResponse(w, errMsg, 500)
 				return
@@ -58,5 +58,5 @@ func Identify(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	writeResponse(w, "Forwarding identify to integrations.", http.StatusOK)
+	writeResponse(w, "Forwarding event to integrations.", http.StatusOK)
 }

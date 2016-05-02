@@ -56,6 +56,56 @@ func TestIdentifyWhenFail(t *testing.T) {
 	}
 }
 
+func TestTrack(t *testing.T) {
+	ic := Intercom{}
+	ic.Client = intercom.NewClient("", "")
+	es := &FakeIntercomEventsServiceSuccess{t: t}
+	ic.EventRepository = es
+
+	event := integrations.Event{
+		Name:   "account.created",
+		UserID: "123",
+		Properties: map[string]interface{}{
+			"email": "john@example.com",
+		},
+		Timestamp: 1234567,
+	}
+
+	err := ic.Track(event)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !es.SaveCalled {
+		t.Error("Save was NOT called on the event")
+	}
+}
+
+func TestTrackWhenFail(t *testing.T) {
+	ic := Intercom{}
+	ic.Client = intercom.NewClient("", "")
+	es := &FakeIntercomEventsServiceFailing{t: t}
+	ic.EventRepository = es
+
+	event := integrations.Event{
+		Name:   "account.created",
+		UserID: "123",
+		Properties: map[string]interface{}{
+			"email": "john@example.com",
+		},
+		Timestamp: 1234567,
+	}
+
+	err := ic.Track(event)
+	if err == nil {
+		t.Fatal("Expecting an error")
+	}
+
+	if !es.SaveCalled {
+		t.Error("Save was NOT called on the event")
+	}
+}
+
 func TestEnabledWhenConfigured(t *testing.T) {
 	if err := os.Setenv("INTERCOM_API_KEY", "ABC"); err != nil {
 		t.Fatal(err)
@@ -146,4 +196,38 @@ func (api FakeIntercomAPIWhenCreate) Save(user intercom.User) (savedUser interco
 		api.t.Errorf("Wrong user. Expected \n%#v\n but got \n%#v\n", expectedUser, user)
 	}
 	return
+}
+
+type FakeIntercomEventsServiceSuccess struct {
+	t          *testing.T
+	SaveCalled bool
+}
+
+func (es *FakeIntercomEventsServiceSuccess) Save(event *intercom.Event) error {
+	es.SaveCalled = true
+	expectedEvent := &intercom.Event{
+		UserID:    "123",
+		EventName: "account.created",
+		Metadata: map[string]interface{}{
+			"email": "john@example.com",
+		},
+		Email:     "john@example.com",
+		CreatedAt: 1234567,
+	}
+
+	if !reflect.DeepEqual(event, expectedEvent) {
+		es.t.Errorf("Wrong event. Expected \n%#v\n but got \n%#v\n", expectedEvent, event)
+	}
+
+	return nil
+}
+
+type FakeIntercomEventsServiceFailing struct {
+	t          *testing.T
+	SaveCalled bool
+}
+
+func (es *FakeIntercomEventsServiceFailing) Save(event *intercom.Event) error {
+	es.SaveCalled = true
+	return errors.New("some error")
 }

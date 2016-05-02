@@ -17,6 +17,12 @@ func (Mixpanel) Identify(identification integrations.Identification) (err error)
 	return
 }
 
+// Track forwards the event to Mixpanel
+func (Mixpanel) Track(event integrations.Event) (err error) {
+	log.Printf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", event)
+	return
+}
+
 // Enabled returns wether or not the Mixpanel integration is enabled/configured
 func (Mixpanel) Enabled() bool {
 	return apiKey() != "" && token() != ""
