@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/jipiboily/forwardlytics/integrations"
 )
@@ -127,11 +128,6 @@ func (FailingIntegration) Enabled() bool {
 }
 
 func TestTrackWhenValid(t *testing.T) {
-
-	// receivedAt is set
-
-	// Dispatching to integrations
-
 	expectedStatusCode := 200
 	expectedBody := `{"message": "Forwarding event to integrations."}`
 
@@ -147,7 +143,7 @@ func TestTrackWhenValid(t *testing.T) {
 	}
 	w := httptest.NewRecorder()
 
-	integration := &CalledIntegration{}
+	integration := &CalledIntegration{t: t}
 	integrations.RegisterIntegration("test-only-integration-called", integration)
 	defer integrations.RemoveIntegration("test-only-integration-called")
 
@@ -167,19 +163,23 @@ func TestTrackWhenValid(t *testing.T) {
 	}
 }
 
-// CalledIntegration
 type CalledIntegration struct {
 	FakeIntegration
 	Tracked bool
+	t       *testing.T
 }
 
-func (i *CalledIntegration) Track(_ integrations.Event) error {
-	fmt.Println("IN TRACK....!!!!!!!!!!!")
+func (i *CalledIntegration) Track(event integrations.Event) error {
 	i.Tracked = true
+
+	expectedReceivedAtCloseTo := time.Now().Unix() - 5
+	if event.ReceivedAt < expectedReceivedAtCloseTo {
+		i.t.Errorf("ReceivedAt looks wrong. Expecting something close to %v but got %v", expectedReceivedAtCloseTo, event.ReceivedAt)
+	}
+
 	return nil
 }
 
-// Enabled returns true because this failing integraiton is enabled
 func (i CalledIntegration) Enabled() bool {
 	return true
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/jipiboily/forwardlytics/integrations"
 )
 
+// Track is taking an event to send it to the enabled integrations
 func Track(w http.ResponseWriter, r *http.Request) {
 	// This is the soonest we can do that, pretty much at least.
 	receivedAt := time.Now().Unix()
