@@ -47,7 +47,7 @@ cURL example:
 ```
 curl --request POST \
 --header "Content-Type: application/json" \
---header "FORWARDLYTICS_API_KEY: 123ma" \
+--header "Forwardlytics-Api-Key: 123ma" \
 -d '{"userID":"123", "userTraits":{"number_of_things":"42"},"timestamp":1459532831}' http://localhost:3000/identify
 ```
 
