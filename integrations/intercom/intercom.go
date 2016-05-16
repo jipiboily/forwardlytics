@@ -66,6 +66,18 @@ func (i Intercom) Track(event integrations.Event) (err error) {
 	}
 
 	err = i.EventRepository.Save(&icEvent)
+
+	if herr, ok := err.(intercom.IntercomError); ok && herr.GetCode() == "not_found" {
+		log.Println("User not found, we need to create it first, then try again", herr)
+		icUser := intercom.User{UserID: icEvent.UserID}
+		_, err = i.Service.Save(icUser)
+		if err == nil {
+			log.Printf("User created on Intercom as part of sending an event")
+		} else {
+			log.Println("Error while creating user on Intercom as part of sending an event:", err)
+		}
+	}
+
 	if err != nil {
 		log.Println("Error while saving event on Intercom:", err)
 	}
