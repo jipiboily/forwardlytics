@@ -8,6 +8,7 @@ import (
 
 	"github.com/jipiboily/forwardlytics/integrations"
 	intercom "gopkg.in/intercom/intercom-go.v2"
+	intercomInterfaces "gopkg.in/intercom/intercom-go.v2/interfaces"
 )
 
 func TestIdentifySuccessWhenCreate(t *testing.T) {
@@ -120,6 +121,37 @@ func TestTrackWhenFail(t *testing.T) {
 
 	if !es.SaveCalled {
 		t.Error("Save was NOT called on the event")
+	}
+}
+
+func TestTrackWhenUserDoesNotExists(t *testing.T) {
+	ic := Intercom{}
+	ic.Client = intercom.NewClient("", "")
+	es := &FakeIntercomEventsServiceFailingWithNotFound{t: t}
+	ic.EventRepository = es
+	service := &FakeIntercomAPISuccessCreateNewUserFromTrack{t: t}
+	ic.Service = service
+
+	event := integrations.Event{
+		Name:   "account.created",
+		UserID: "123",
+		Properties: map[string]interface{}{
+			"email": "john@example.com",
+		},
+		Timestamp: 1234567,
+	}
+
+	err := ic.Track(event)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !es.SaveCalled {
+		t.Error("Save was NOT called on the event")
+	}
+
+	if !service.SaveCalled {
+		t.Error("New Intercom user was NOT created as expected")
 	}
 }
 
@@ -253,4 +285,39 @@ type FakeIntercomEventsServiceFailing struct {
 func (es *FakeIntercomEventsServiceFailing) Save(event *intercom.Event) error {
 	es.SaveCalled = true
 	return errors.New("some error")
+}
+
+type FakeIntercomEventsServiceFailingWithNotFound struct {
+	t          *testing.T
+	SaveCalled bool
+}
+
+func (es *FakeIntercomEventsServiceFailingWithNotFound) Save(event *intercom.Event) error {
+	es.SaveCalled = true
+	err := intercomInterfaces.HTTPError{
+		StatusCode: 404,
+		Code:       "not_found",
+		Message:    "Some message for not found",
+	}
+	return err
+}
+
+type FakeIntercomAPISuccessCreateNewUserFromTrack struct {
+	t          *testing.T
+	SaveCalled bool
+}
+
+func (api FakeIntercomAPISuccessCreateNewUserFromTrack) FindByUserID(userID string) (user intercom.User, err error) {
+	return
+}
+
+func (api *FakeIntercomAPISuccessCreateNewUserFromTrack) Save(user intercom.User) (savedUser intercom.User, err error) {
+	api.SaveCalled = true
+	expectedUser := intercom.User{
+		UserID: "123",
+	}
+	if !reflect.DeepEqual(user, expectedUser) {
+		api.t.Errorf("Wrong user. Expected \n%#v\n but got \n%#v\n", expectedUser, user)
+	}
+	return
 }
