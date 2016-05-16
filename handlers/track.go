@@ -28,6 +28,7 @@ func Track(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&event)
 	if err != nil {
 		log.Println("Bad request:", r.Body)
+		log.Println("err", err)
 		writeResponse(w, "Invalid request.", http.StatusBadRequest)
 		return
 	}
