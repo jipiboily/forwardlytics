@@ -2,6 +2,7 @@ package intercom
 
 import (
 	"os"
+	"reflect"
 	"strings"
 
 	"github.com/Sirupsen/logrus"
@@ -29,7 +30,12 @@ func (i Intercom) Identify(identification integrations.Identification) (err erro
 		}
 	}
 
-	icUser.CustomAttributes = identification.UserTraits
+	if identification.UserTraits != nil {
+		icUser.CustomAttributes = identification.UserTraits
+	} else {
+		icUser.CustomAttributes = make(map[string]interface{})
+	}
+	icUser.CustomAttributes["forwardlyticsReceivedAt"] = identification.ReceivedAt
 
 	if identification.UserTraits["email"] != nil {
 		icUser.Email = identification.UserTraits["email"].(string)
@@ -60,7 +66,21 @@ func (i Intercom) Track(event integrations.Event) (err error) {
 	icEvent.UserID = event.UserID
 	icEvent.EventName = event.Name
 	icEvent.CreatedAt = event.Timestamp
-	icEvent.Metadata = event.Properties
+
+	// It removes the properties that are map, as they are not supported
+	// by Intercom. See the `Metadata support` section of
+	// https://docs.intercom.io/the-intercom-platform/tracking-events-in-intercom
+	metaData := make(map[string]interface{})
+	for k, v := range event.Properties {
+		if !(reflect.TypeOf(event.Properties[k]).Kind() == reflect.Map) {
+			metaData[k] = v
+		}
+	}
+
+	metaData["forwardlyticsReceivedAt"] = event.ReceivedAt
+
+	icEvent.Metadata = metaData
+
 	if event.Properties["email"] != nil {
 		icEvent.Email = event.Properties["email"].(string)
 	}
