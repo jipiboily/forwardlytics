@@ -1,9 +1,9 @@
 package mixpanel
 
 import (
-	"log"
 	"os"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/jipiboily/forwardlytics/integrations"
 )
 
@@ -13,13 +13,13 @@ type Mixpanel struct {
 
 // Identify forwards and identify call to Mixpanel
 func (Mixpanel) Identify(identification integrations.Identification) (err error) {
-	log.Printf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", identification)
+	logrus.Errorf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", identification)
 	return
 }
 
 // Track forwards the event to Mixpanel
 func (Mixpanel) Track(event integrations.Event) (err error) {
-	log.Printf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", event)
+	logrus.Errorf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", event)
 	return
 }
 

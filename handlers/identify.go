@@ -3,11 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/jipiboily/forwardlytics/integrations"
 )
 
@@ -27,7 +27,7 @@ func Identify(w http.ResponseWriter, r *http.Request) {
 	var identification integrations.Identification
 	err := decoder.Decode(&identification)
 	if err != nil {
-		log.Println("Bad request:", r.Body)
+		logrus.WithField("err", err).WithField("body", r.Body).Error("Bad request in Identify")
 		writeResponse(w, "Invalid request.", http.StatusBadRequest)
 		return
 	}
@@ -46,11 +46,11 @@ func Identify(w http.ResponseWriter, r *http.Request) {
 	for _, integrationName := range integrations.IntegrationList() {
 		integration := integrations.GetIntegration(integrationName)
 		if integration.Enabled() {
-			log.Println("Forwarding idenitify to", integrationName)
+			logrus.Infof("Forwarding idenitify to %s", integrationName)
 			err := integration.Identify(identification)
 			if err != nil {
 				errMsg := fmt.Sprintf("Fatal error during identification with an integration (%s): %s", integrationName, err)
-				log.Println(errMsg)
+				logrus.WithField("integration", integrationName).WithField("identification", identification).WithField("err", err).Error("Fatal error during identification")
 				writeResponse(w, errMsg, 500)
 				return
 			}
