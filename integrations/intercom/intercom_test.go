@@ -14,7 +14,7 @@ import (
 func TestIdentifySuccessWhenCreate(t *testing.T) {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
-	service := &FakeIntercomAPIWhenCreate{t: t}
+	service := &FakeIntercomAPIWhenCreate{}
 	ic.Service = service
 	identification := integrations.Identification{
 		UserID: "123",
@@ -23,6 +23,7 @@ func TestIdentifySuccessWhenCreate(t *testing.T) {
 			"email":     "john@example.com",
 			"createdAt": float64(123),
 		},
+		ReceivedAt: 3344,
 	}
 
 	err := ic.Identify(identification)
@@ -32,13 +33,31 @@ func TestIdentifySuccessWhenCreate(t *testing.T) {
 
 	if !service.SaveCalled {
 		t.Error("Save was NOT called on the event")
+	}
+
+	expectedUser := intercom.User{
+		UserID:     "123",
+		Name:       "John Doe",
+		Email:      "john@example.com",
+		CreatedAt:  123,
+		SignedUpAt: 123,
+		CustomAttributes: map[string]interface{}{
+			"name":                    "John Doe",
+			"email":                   "john@example.com",
+			"createdAt":               float64(123),
+			"forwardlyticsReceivedAt": int64(3344),
+		},
+	}
+
+	if !reflect.DeepEqual(service.ReceivedUser, expectedUser) {
+		t.Errorf("Wrong user. Expected \n%#v\n but got \n%#v\n", expectedUser, service.ReceivedUser)
 	}
 }
 
 func TestIdentifySuccessWhenUpdate(t *testing.T) {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
-	service := &FakeIntercomAPISuccess{t: t}
+	service := &FakeIntercomAPISuccess{}
 	ic.Service = service
 	identification := integrations.Identification{
 		UserID: "123",
@@ -47,6 +66,7 @@ func TestIdentifySuccessWhenUpdate(t *testing.T) {
 			"email":     "john@example.com",
 			"createdAt": float64(123),
 		},
+		ReceivedAt: 234,
 	}
 
 	err := ic.Identify(identification)
@@ -56,6 +76,23 @@ func TestIdentifySuccessWhenUpdate(t *testing.T) {
 
 	if !service.SaveCalled {
 		t.Error("Save was NOT called on the event")
+	}
+
+	expectedUser := intercom.User{
+		Name:       "John Doe",
+		Email:      "john@example.com",
+		CreatedAt:  123,
+		SignedUpAt: 123,
+		CustomAttributes: map[string]interface{}{
+			"name":                    "John Doe",
+			"email":                   "john@example.com",
+			"createdAt":               float64(123),
+			"forwardlyticsReceivedAt": int64(234),
+		},
+	}
+
+	if !reflect.DeepEqual(service.ReceivedUser, expectedUser) {
+		t.Errorf("Wrong user. Expected \n%#v\n but got \n%#v\n", expectedUser, service.ReceivedUser)
 	}
 }
 
@@ -77,7 +114,7 @@ func TestIdentifyWhenFail(t *testing.T) {
 func TestTrack(t *testing.T) {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
-	es := &FakeIntercomEventsServiceSuccess{t: t}
+	es := &FakeIntercomEventsService{t: t}
 	ic.EventRepository = es
 
 	event := integrations.Event{
@@ -86,7 +123,8 @@ func TestTrack(t *testing.T) {
 		Properties: map[string]interface{}{
 			"email": "john@example.com",
 		},
-		Timestamp: 1234567,
+		Timestamp:  1234567,
+		ReceivedAt: 65,
 	}
 
 	err := ic.Track(event)
@@ -96,6 +134,21 @@ func TestTrack(t *testing.T) {
 
 	if !es.SaveCalled {
 		t.Error("Save was NOT called on the event")
+	}
+
+	expectedEvent := &intercom.Event{
+		UserID:    "123",
+		EventName: "account.created",
+		Metadata: map[string]interface{}{
+			"email":                   "john@example.com",
+			"forwardlyticsReceivedAt": int64(65),
+		},
+		Email:     "john@example.com",
+		CreatedAt: 1234567,
+	}
+
+	if !reflect.DeepEqual(es.ReceivedEvent, expectedEvent) {
+		es.t.Errorf("Wrong event. Expected \n%#v\n but got \n%#v\n", expectedEvent, es.ReceivedEvent)
 	}
 }
 
@@ -155,6 +208,55 @@ func TestTrackWhenUserDoesNotExists(t *testing.T) {
 	}
 }
 
+func TestTrackWhenAPropertyIsAMap(t *testing.T) {
+	// It removes the properties that are map, as they are not supported
+	// by Intercom. See the `Metadata support` section of
+	// https://docs.intercom.io/the-intercom-platform/tracking-events-in-intercom
+	ic := Intercom{}
+	ic.Client = intercom.NewClient("", "")
+	es := &FakeIntercomEventsService{t: t}
+	ic.EventRepository = es
+
+	settings := map[string]interface{}{
+		"metric_name": "rt:activeUsers",
+	}
+
+	event := integrations.Event{
+		Name:   "account.created",
+		UserID: "123",
+		Properties: map[string]interface{}{
+			"email":    "john@example.com",
+			"settings": settings,
+		},
+		Timestamp:  1234567,
+		ReceivedAt: 33445,
+	}
+
+	err := ic.Track(event)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !es.SaveCalled {
+		t.Error("Save was NOT called on the event")
+	}
+
+	expectedEvent := &intercom.Event{
+		UserID:    "123",
+		EventName: "account.created",
+		Metadata: map[string]interface{}{
+			"email":                   "john@example.com",
+			"forwardlyticsReceivedAt": int64(33445),
+		},
+		Email:     "john@example.com",
+		CreatedAt: 1234567,
+	}
+
+	if !reflect.DeepEqual(es.ReceivedEvent, expectedEvent) {
+		es.t.Errorf("Wrong event. Expected \n%#v\n but got \n%#v\n", expectedEvent, es.ReceivedEvent)
+	}
+}
+
 func TestEnabledWhenConfigured(t *testing.T) {
 	if err := os.Setenv("INTERCOM_API_KEY", "ABC"); err != nil {
 		t.Fatal(err)
@@ -184,8 +286,8 @@ func TestEnabledWhenNotConfigured(t *testing.T) {
 }
 
 type FakeIntercomAPISuccess struct {
-	t          *testing.T
-	SaveCalled bool
+	SaveCalled   bool
+	ReceivedUser intercom.User
 }
 
 func (api FakeIntercomAPISuccess) FindByUserID(userID string) (user intercom.User, err error) {
@@ -194,20 +296,7 @@ func (api FakeIntercomAPISuccess) FindByUserID(userID string) (user intercom.Use
 
 func (api *FakeIntercomAPISuccess) Save(user intercom.User) (savedUser intercom.User, err error) {
 	api.SaveCalled = true
-	expectedUser := intercom.User{
-		Name:       "John Doe",
-		Email:      "john@example.com",
-		CreatedAt:  123,
-		SignedUpAt: 123,
-		CustomAttributes: map[string]interface{}{
-			"name":      "John Doe",
-			"email":     "john@example.com",
-			"createdAt": float64(123),
-		},
-	}
-	if !reflect.DeepEqual(user, expectedUser) {
-		api.t.Errorf("Wrong user. Expected \n%#v\n but got \n%#v\n", expectedUser, user)
-	}
+	api.ReceivedUser = user
 	return
 }
 
@@ -223,9 +312,9 @@ func (api *FakeIntercomAPIFailSave) Save(user intercom.User) (savedUser intercom
 }
 
 type FakeIntercomAPIWhenCreate struct {
-	t *testing.T
 	FakeIntercomAPISuccess
-	SaveCalled bool
+	SaveCalled   bool
+	ReceivedUser intercom.User
 }
 
 func (api FakeIntercomAPIWhenCreate) FindByUserID(userID string) (user intercom.User, err error) {
@@ -235,45 +324,19 @@ func (api FakeIntercomAPIWhenCreate) FindByUserID(userID string) (user intercom.
 
 func (api *FakeIntercomAPIWhenCreate) Save(user intercom.User) (savedUser intercom.User, err error) {
 	api.SaveCalled = true
-	expectedUser := intercom.User{
-		UserID:     "123",
-		Name:       "John Doe",
-		Email:      "john@example.com",
-		CreatedAt:  123,
-		SignedUpAt: 123,
-		CustomAttributes: map[string]interface{}{
-			"name":      "John Doe",
-			"email":     "john@example.com",
-			"createdAt": float64(123),
-		},
-	}
-	if !reflect.DeepEqual(user, expectedUser) {
-		api.t.Errorf("Wrong user. Expected \n%#v\n but got \n%#v\n", expectedUser, user)
-	}
+	api.ReceivedUser = user
 	return
 }
 
-type FakeIntercomEventsServiceSuccess struct {
-	t          *testing.T
-	SaveCalled bool
+type FakeIntercomEventsService struct {
+	t             *testing.T
+	SaveCalled    bool
+	ReceivedEvent *intercom.Event
 }
 
-func (es *FakeIntercomEventsServiceSuccess) Save(event *intercom.Event) error {
+func (es *FakeIntercomEventsService) Save(event *intercom.Event) error {
 	es.SaveCalled = true
-	expectedEvent := &intercom.Event{
-		UserID:    "123",
-		EventName: "account.created",
-		Metadata: map[string]interface{}{
-			"email": "john@example.com",
-		},
-		Email:     "john@example.com",
-		CreatedAt: 1234567,
-	}
-
-	if !reflect.DeepEqual(event, expectedEvent) {
-		es.t.Errorf("Wrong event. Expected \n%#v\n but got \n%#v\n", expectedEvent, event)
-	}
-
+	es.ReceivedEvent = event
 	return nil
 }
 
