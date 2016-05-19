@@ -1,10 +1,10 @@
 package intercom
 
 import (
-	"log"
 	"os"
 	"strings"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/jipiboily/forwardlytics/integrations"
 	intercom "gopkg.in/intercom/intercom-go.v2"
 )
@@ -24,7 +24,7 @@ func (i Intercom) Identify(identification integrations.Identification) (err erro
 			// The user doesn't exist, we just need to create it.
 			icUser = intercom.User{UserID: identification.UserID}
 		} else {
-			log.Println("Error fetching the Intercom user:", err)
+			logrus.WithField("err", err).Error("Error fetching the Intercom user")
 			return
 		}
 	}
@@ -47,9 +47,9 @@ func (i Intercom) Identify(identification integrations.Identification) (err erro
 
 	savedUser, err := i.Service.Save(icUser)
 	if err == nil {
-		log.Printf("User saved on Intercom: %#v\n", savedUser)
+		logrus.WithField("savedUser", savedUser).Error("User saved on Intercom")
 	} else {
-		log.Println("Error while saving on Intercom:", err)
+		logrus.WithField("err", err).Error("Error while saving on Intercom")
 	}
 	return
 }
@@ -68,18 +68,18 @@ func (i Intercom) Track(event integrations.Event) (err error) {
 	err = i.EventRepository.Save(&icEvent)
 
 	if herr, ok := err.(intercom.IntercomError); ok && herr.GetCode() == "not_found" {
-		log.Println("User not found, we need to create it first, then try again", herr)
+		logrus.WithField("herr", herr).Warn("User not found, we need to create it first, then try again")
 		icUser := intercom.User{UserID: icEvent.UserID}
 		_, err = i.Service.Save(icUser)
 		if err == nil {
-			log.Printf("User created on Intercom as part of sending an event")
+			logrus.Info("User created on Intercom as part of sending an event")
 		} else {
-			log.Println("Error while creating user on Intercom as part of sending an event:", err)
+			logrus.WithField("err", err).Error("User created on Intercom as part of sending an event")
 		}
 	}
 
 	if err != nil {
-		log.Println("Error while saving event on Intercom:", err)
+		logrus.WithField("err", err).Error("Error while saving event on Intercom")
 	}
 	return
 }

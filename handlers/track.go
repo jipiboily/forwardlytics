@@ -3,11 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/jipiboily/forwardlytics/integrations"
 )
 
@@ -27,8 +27,7 @@ func Track(w http.ResponseWriter, r *http.Request) {
 	var event integrations.Event
 	err := decoder.Decode(&event)
 	if err != nil {
-		log.Println("Bad request:", r.Body)
-		log.Println("err", err)
+		logrus.WithField("err", err).WithField("body", r.Body).Error("Bad request in Track")
 		writeResponse(w, "Invalid request.", http.StatusBadRequest)
 		return
 	}
@@ -47,11 +46,11 @@ func Track(w http.ResponseWriter, r *http.Request) {
 	for _, integrationName := range integrations.IntegrationList() {
 		integration := integrations.GetIntegration(integrationName)
 		if integration.Enabled() {
-			log.Println("Forwarding event to", integrationName)
+			logrus.Infof("Forwarding event to %s", integrationName)
 			err := integration.Track(event)
 			if err != nil {
 				errMsg := fmt.Sprintf("Fatal error during event with an integration (%s): %s", integrationName, err)
-				log.Println(errMsg)
+				logrus.WithField("integration", integrationName).WithField("event", event).WithField("err", err).Error("Fatal error during event")
 				writeResponse(w, errMsg, 500)
 				return
 			}

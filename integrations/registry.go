@@ -1,10 +1,11 @@
 package integrations
 
 import (
-	"log"
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/Sirupsen/logrus"
 )
 
 var integrationsMu sync.Mutex
@@ -48,7 +49,7 @@ func IntegrationList() []string {
 // RemoveIntegration is ONLY used for tests, to be able remove a test integration
 func RemoveIntegration(name string) {
 	if !strings.HasPrefix(name, "test-only-integration-") {
-		log.Fatal("THIS IS ONLY FOR TESTING!!")
+		logrus.Error("THIS IS ONLY FOR TESTING!!")
 	}
 	integrationsMu.Lock()
 	defer integrationsMu.Unlock()
