@@ -2,10 +2,22 @@
 	"ImportPath": "github.com/jipiboily/forwardlytics",
 	"GoVersion": "go1.6",
 	"GodepVersion": "v60",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.10.0-16-gcd7d1bb",
+			"Rev": "cd7d1bbe41066b6c1f19780f895901052150a575"
+		},
 		{
 			"ImportPath": "github.com/google/go-querystring/query",
 			"Rev": "6bb77fe6f42b85397288d4f6f67ac72f8f400ee7"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "d4feaf1a7e61e1d9e79e6c4e76c6349e9cab0a03"
 		},
 		{
 			"ImportPath": "gopkg.in/intercom/intercom-go.v2",
