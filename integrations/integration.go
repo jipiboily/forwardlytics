@@ -55,7 +55,7 @@ type Event struct {
 	// Timestamp of when the identifiaction originally triggered
 	Timestamp int64 `json:"timestamp"`
 
-	// Timestamp of when Forwardlytics received the identifiaction.
+	// ReceivedAt of when Forwardlytics received the identifiaction.
 	ReceivedAt int64 `json:"receivedAt"`
 }
 

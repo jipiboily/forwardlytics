@@ -55,7 +55,6 @@ func Track(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-
 	}
 
 	writeResponse(w, "Forwarding event to integrations.", http.StatusOK)

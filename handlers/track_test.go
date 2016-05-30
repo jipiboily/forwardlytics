@@ -24,7 +24,7 @@ func TestTrackWhenNotPOST(t *testing.T) {
 	Track(w, r)
 
 	if w.Code != expectedStatusCode {
-		t.Errorf("Wrong status code. Expecting %v but got %v", expectedStatusCode, w.Code)
+		t.Errorf(`Wrong status code. Expecting %v but got %v`, expectedStatusCode, w.Code)
 	}
 
 	if !strings.Contains(w.Body.String(), expectedBody) {
