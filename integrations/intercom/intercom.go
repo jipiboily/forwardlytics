@@ -87,19 +87,20 @@ func (i Intercom) Track(event integrations.Event) (err error) {
 
 	err = i.EventRepository.Save(&icEvent)
 
+	logWF := logrus.WithField("event.UserID", event.UserID).WithField("event.Name", event.Name)
 	if herr, ok := err.(intercom.IntercomError); ok && herr.GetCode() == "not_found" {
-		logrus.WithField("herr", herr).Warn("User not found, we need to create it first, then try again")
+		logWF.WithField("herr", herr).Warn("User not found, we need to create it first, then try again")
 		icUser := intercom.User{UserID: icEvent.UserID}
 		_, err = i.Service.Save(icUser)
 		if err == nil {
-			logrus.Info("User created on Intercom as part of sending an event")
+			logWF.Info("User created on Intercom as part of sending an event")
 		} else {
-			logrus.WithField("err", err).Error("User created on Intercom as part of sending an event")
+			logWF.WithField("err", err).Error("User created on Intercom as part of sending an event")
 		}
 	}
 
 	if err != nil {
-		logrus.WithField("err", err).Error("Error while saving event on Intercom")
+		logWF.WithField("err", err).Error("Error while saving event on Intercom")
 	}
 	return
 }
