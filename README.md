@@ -23,15 +23,26 @@ To send to Intercom:
 - set `INTERCOM_API_KEY=123`
 - set `INTERCOM_APP_ID=456`
 
-To send to Mixpanel:
-- set `MIXPANEL_TOKEN=abc`
-- set `MIXPANEL_API_KEY=123`
-
-[Drip][drip] and [Keen.io][keen.io] are probably going to be next.
+[Mixpanel][mixpanel], [Drip][drip] and [Keen.io][keen.io] are probably going to be next.
 
 ## Deployment
 
 Forwardlytics can be deployed to [Heroku][heroku]. You can setup the port it starts on by setting the `PORT` environment variable.
+
+## Error tracking
+
+Right Forwardlytics supports tracking error via Bugsnag. Thanks to Logrus, it's pretty easy to add any other bug tracker. PRs welcome.
+
+### Bugsnag config
+
+To enable Bugsnag, set those environment variables:
+
+```
+BUGSNAG_API_KEY=your-api-key-123
+ENVIRONMENT=development
+```
+
+If the environment is not set, it'll work but defaults to `development`.
 
 ## You need an integration that doesn't exist yet?
 
@@ -71,6 +82,8 @@ You need to set environment variables for the integrations you want to work with
 
 [intercom]: https://www.intercom.io/
 [mixpanel]: https://mixpanel.com/
+[drip]: http://getdrip.com/
+[keen.io]: http://keen.io/
 [heroku]: https://www.heroku.com/
 [forwardlytics-on-waffle]: https://waffle.io/jipiboily/forwardlytics
 [integration.go]: https://github.com/jipiboily/forwardlytics/blob/master/integrations/integration.go
