@@ -9,6 +9,8 @@ import (
 	_ "github.com/jipiboily/forwardlytics/integrations/drip"
 	_ "github.com/jipiboily/forwardlytics/integrations/intercom"
 	_ "github.com/jipiboily/forwardlytics/integrations/mixpanel"
+
+	_ "github.com/jipiboily/forwardlytics/errortracker"
 )
 
 func main() {
@@ -23,6 +25,6 @@ func main() {
 
 	http.Handle("/identify", handlers.AuthMiddleware(http.HandlerFunc(handlers.Identify)))
 	http.Handle("/track", handlers.AuthMiddleware(http.HandlerFunc(handlers.Track)))
-	logrus.Info("Forwardlytics started on port", port)
+	logrus.Infof("Forwardlytics started on port %v", port)
 	logrus.Fatal(http.ListenAndServe(":"+port, nil))
 }

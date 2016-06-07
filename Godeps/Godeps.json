@@ -7,9 +7,32 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/Shopify/logrus-bugsnag",
+			"Rev": "5a46080c635f13e8b60c24765c19d62e1ca8d0fb"
+		},
+		{
 			"ImportPath": "github.com/Sirupsen/logrus",
 			"Comment": "v0.10.0-16-gcd7d1bb",
 			"Rev": "cd7d1bbe41066b6c1f19780f895901052150a575"
+		},
+		{
+			"ImportPath": "github.com/bugsnag/bugsnag-go",
+			"Comment": "v1.0.5-22-gc9e531f",
+			"Rev": "c9e531f2d53d8321f991457f594e62fa7ae8a9aa"
+		},
+		{
+			"ImportPath": "github.com/bugsnag/bugsnag-go/errors",
+			"Comment": "v1.0.5-22-gc9e531f",
+			"Rev": "c9e531f2d53d8321f991457f594e62fa7ae8a9aa"
+		},
+		{
+			"ImportPath": "github.com/bugsnag/osext",
+			"Rev": "0dd3f918b21bec95ace9dc86c7e70266cfc5c702"
+		},
+		{
+			"ImportPath": "github.com/bugsnag/panicwrap",
+			"Comment": "1.1.0-1-gd6191e2",
+			"Rev": "d6191e27ad06236eaad65d79e49a08b03b9f8029"
 		},
 		{
 			"ImportPath": "github.com/google/go-querystring/query",
