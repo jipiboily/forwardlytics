@@ -53,7 +53,7 @@ func (i Intercom) Identify(identification integrations.Identification) (err erro
 
 	savedUser, err := i.Service.Save(icUser)
 	if err == nil {
-		logrus.WithField("savedUser", savedUser).Error("User saved on Intercom")
+		logrus.WithField("savedUser", savedUser).Info("User saved on Intercom")
 	} else {
 		logrus.WithField("err", err).Error("Error while saving on Intercom")
 	}
