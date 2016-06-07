@@ -196,15 +196,18 @@ func TestTrackWhenUserDoesNotExists(t *testing.T) {
 
 	err := ic.Track(event)
 	if err != nil {
-		t.Fatal(err)
+		herr, ok := err.(intercom.IntercomError)
+		if !ok || herr.GetCode() != "not_found" {
+			t.Fatal(err)
+		}
 	}
 
 	if !es.SaveCalled {
 		t.Error("Save was NOT called on the event")
 	}
 
-	if !service.SaveCalled {
-		t.Error("New Intercom user was NOT created as expected")
+	if service.SaveCalled {
+		t.Error("New Intercom user was created, and it should not")
 	}
 }
 
