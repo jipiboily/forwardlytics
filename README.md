@@ -2,13 +2,17 @@
   <img src="https://s3.amazonaws.com/forwardlytics-assets/logo-color.svg">
 </p>
 
-Takes event in and forwards them to various places.
+Forwards analytics events and identification to various marketing & analytics platforms.
 
-You can send events to Forwardlytics, and it will forward it to many services like [Intercom][intercom] or [Mixpanel][mixpanel].
+You can send events to Forwardlytics, and it will forward it to the configured services like [Intercom][intercom] or [Drip][drip].
 
-**THIS IS A VERY VERY EARLY NON WORKING VERSION**. Use at your own risk, or contribute :)
+## Status
 
-Where are we at? What needs to be done and what's in the pipeline? See [Forawrdlytics on waffle.io][forwardlytics-on-waffle]
+Where are we at? Can you use it in production?
+
+It is used by [Metrics Watch][metricswatch] for now and it has been for a while now. I would not say it is rock solid but it has been working well enough for us.
+
+What needs to be done and what's in the pipeline? See [Forwardlytics on waffle.io][forwardlytics-on-waffle]
 
 [![Build Status](https://travis-ci.org/jipiboily/forwardlytics.svg?branch=master)](https://travis-ci.org/jipiboily/forwardlytics)
 [![Stories in Progress](https://badge.waffle.io/jipiboily/forwardlytics.svg?label=In%20Progress&title=In%20Progress)](http://waffle.io/jipiboily/forwardlytics)
@@ -28,15 +32,13 @@ To send to Drip:
 - set `DRIP_ACCOUNT_ID=234` (found here: https://www.getdrip.com/{drip_account_id}/settings/site under "3rd party integrations")
 - set `DRIP_API_TOKEN=432` (found here: https://www.getdrip.com/user/edit under "API-token")
 
-[Mixpanel][mixpanel] and [Keen.io][keen.io] are probably going to be next.
-
 ## Deployment
 
 Forwardlytics can be deployed to [Heroku][heroku]. You can setup the port it starts on by setting the `PORT` environment variable.
 
 ## Error tracking
 
-Right Forwardlytics supports tracking error via Bugsnag. Thanks to Logrus, it's pretty easy to add any other bug tracker. PRs welcome.
+Right now Forwardlytics supports tracking error via Bugsnag. Thanks to Logrus, it's pretty easy to add any other bug tracker. PRs welcome.
 
 ### Bugsnag config
 
@@ -54,7 +56,7 @@ If the environment is not set, it'll work but defaults to `development`.
 You have two options:
 
 - send a PR adding it.
-- get in touch to have it added by the author (for a fee).
+- [get in touch to have it added by the author (for a fee)][email].
 
 ## Calling the API
 
@@ -85,6 +87,12 @@ You need to set environment variables for the integrations you want to work with
 
 [Read "Self-hosted Segment equivalent?" on Medium][self-hosted-segment-equivalent]
 
+## Thanks!
+
+Thanks to my friend <a href="https://twitter.com/juliandoesstuff" target="_blank">Julian</a> for the logo! :grinning:
+
+[email]: mailto:jp@metrics.watch
+[metricswatch]: http://metricswatch.com
 [intercom]: https://www.intercom.io/
 [mixpanel]: https://mixpanel.com/
 [drip]: http://getdrip.com/
@@ -95,7 +103,3 @@ You need to set environment variables for the integrations you want to work with
 [codegangsta/gin]: https://github.com/codegangsta/gin
 [https://github.com/tools/godep]: https://github.com/tools/godep
 [self-hosted-segment-equivalent]: https://medium.com/@jipiboily/self-hosted-segment-equivalent-c81815e963df
-
-## Thanks!
-
-Thanks to my friend <a href="https://twitter.com/juliandoesstuff" target="_blank">Julian</a> for the logo! :grinning:
