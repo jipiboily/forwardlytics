@@ -23,7 +23,12 @@ To send to Intercom:
 - set `INTERCOM_API_KEY=123`
 - set `INTERCOM_APP_ID=456`
 
-[Mixpanel][mixpanel], [Drip][drip] and [Keen.io][keen.io] are probably going to be next.
+To send to Drip:
+
+- set `DRIP_ACCOUNT_ID=234` (found here: https://www.getdrip.com/{drip_account_id}/settings/site under "3rd party integrations")
+- set `DRIP_API_TOKEN=432` (found here: https://www.getdrip.com/user/edit under "API-token")
+
+[Mixpanel][mixpanel] and [Keen.io][keen.io] are probably going to be next.
 
 ## Deployment
 

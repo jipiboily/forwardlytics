@@ -22,3 +22,9 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# Gin app reloader
+gin-bin
+
+# Compiled main
+main
