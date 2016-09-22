@@ -23,11 +23,11 @@ What needs to be done and what's in the pipeline? See [Forwardlytics on waffle.i
 
 - set `FORWARDLYTICS_API_KEY=SOMETHING_YOU_DECIDE_AND_NO_ONE_CAN_GUESS`
 
-To send to Intercom:
+To send to [Intercom][intercom]:
 - set `INTERCOM_API_KEY=123`
 - set `INTERCOM_APP_ID=456`
 
-To send to Drip:
+To send to [Drip][drip]:
 
 - set `DRIP_ACCOUNT_ID=234` (found here: https://www.getdrip.com/{drip_account_id}/settings/site under "3rd party integrations")
 - set `DRIP_API_TOKEN=432` (found here: https://www.getdrip.com/user/edit under "API-token")
