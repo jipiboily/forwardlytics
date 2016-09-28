@@ -32,6 +32,8 @@ To send to [Drip][drip]:
 - set `DRIP_ACCOUNT_ID=234` (found here: https://www.getdrip.com/{drip_account_id}/settings/site under "3rd party integrations")
 - set `DRIP_API_TOKEN=432` (found here: https://www.getdrip.com/user/edit under "API-token")
 
+**Please note** that you need to send an "email" property to be able to get the Drip integration working.
+
 ## Deployment
 
 Forwardlytics can be deployed to [Heroku][heroku]. You can setup the port it starts on by setting the `PORT` environment variable.
