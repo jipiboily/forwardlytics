@@ -6,6 +6,8 @@ Forwards analytics events and identification to various marketing & analytics pl
 
 You can send events to Forwardlytics, and it will forward it to the configured services like [Intercom][intercom] or [Drip][drip].
 
+Looking for a Forwardlytics client library? There is one for [Ruby just here](https://github.com/jipiboily/forwardlytics-ruby).
+
 ## Status
 
 Where are we at? Can you use it in production?
