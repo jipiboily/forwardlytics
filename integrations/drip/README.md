@@ -1,5 +1,7 @@
 # Drip integration for Forwardlytics
 
+**Please note** that you need to send an "email" property to be able to get the Drip integration working.
+
 ## Configuration
 
 To enable the Drip integration, set these environment variables:
