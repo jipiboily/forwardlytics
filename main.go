@@ -6,6 +6,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/jipiboily/forwardlytics/handlers"
+	_ "github.com/jipiboily/forwardlytics/integrations/drift"
 	_ "github.com/jipiboily/forwardlytics/integrations/drip"
 	_ "github.com/jipiboily/forwardlytics/integrations/intercom"
 	_ "github.com/jipiboily/forwardlytics/integrations/mixpanel"
