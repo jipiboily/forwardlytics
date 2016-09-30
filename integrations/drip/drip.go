@@ -44,7 +44,7 @@ func (d Drip) Identify(identification integrations.Identification) (err error) {
 	s := apiSubscriber{}
 	// Drip needs an email to identify the user
 	if identification.UserTraits["email"] == nil {
-		logrus.Error("Drip: Required field email is not present")
+		logrus.WithField("identification", identification).Error("Drip: Required field email is not present")
 		return errors.New("Email is required for doing a drip request")
 	} else {
 		s.Email = identification.UserTraits["email"].(string)
@@ -97,17 +97,17 @@ func (api dripAPIProduction) request(method string, endpoint string, payload []b
 	resp, err := client.Do(req)
 	defer resp.Body.Close()
 	if err != nil {
-		logrus.WithField("err", err).Error("Error sending request to Drip api")
+		logrus.WithError(err).WithField("method", method).WithField("endpoint", endpoint).WithField("payload", payload).Error("Error sending request to Drip api")
 		return
 	}
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			logrus.WithField("err", err).Error("Error reading body in Drip response")
+			logrus.WithError(err).WithField("method", method).WithField("endpoint", endpoint).WithField("payload", payload).Error("Error reading body in Drip response")
 			return err
 		}
-		logrus.WithFields(
+		logrus.WithField("method", method).WithField("endpoint", endpoint).WithField("payload", payload).WithFields(
 			logrus.Fields{
 				"response":    string(body),
 				"HTTP-status": resp.StatusCode}).Error("Drip api returned errors")

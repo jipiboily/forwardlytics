@@ -25,7 +25,7 @@ func (i Intercom) Identify(identification integrations.Identification) (err erro
 			// The user doesn't exist, we just need to create it.
 			icUser = intercom.User{UserID: identification.UserID}
 		} else {
-			logrus.WithField("err", err).Error("Error fetching the Intercom user")
+			logrus.WithError(err).WithField("identification", identification).Error("Error fetching the Intercom user")
 			return
 		}
 	}
@@ -55,7 +55,7 @@ func (i Intercom) Identify(identification integrations.Identification) (err erro
 	if err == nil {
 		logrus.WithField("savedUser", savedUser).Info("User saved on Intercom")
 	} else {
-		logrus.WithField("err", err).Error("Error while saving on Intercom")
+		logrus.WithError(err).WithField("identification", identification).WithField("icUser", icUser).Error("Error while saving on Intercom")
 	}
 	return
 }
@@ -87,9 +87,8 @@ func (i Intercom) Track(event integrations.Event) (err error) {
 
 	err = i.EventRepository.Save(&icEvent)
 
-	logWF := logrus.WithField("event.UserID", event.UserID).WithField("event.Name", event.Name)
 	if err != nil {
-		logWF.WithField("err", err).Error("Error while saving event on Intercom")
+		logrus.WithError(err).WithField("event", event).WithField("icEvent", icEvent).Error("Error while saving event on Intercom")
 	}
 
 	return
