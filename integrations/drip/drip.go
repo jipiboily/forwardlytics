@@ -65,7 +65,7 @@ func (d Drip) Identify(identification integrations.Identification) (err error) {
 // Track forwards the event to Drip
 func (d Drip) Track(event integrations.Event) (err error) {
 	if event.Properties["email"] == nil {
-		logrus.WithField("err", err).Error("Drip: Required field email is not present")
+		logrus.WithError(err).WithField("event", event).Error("Drip: Required field email is not present")
 		return errors.New("Email is required for doing a drip request")
 	}
 	e := apiEvent{}
