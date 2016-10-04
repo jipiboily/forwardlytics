@@ -52,6 +52,9 @@ func (d Drift) Identify(identification integrations.Identification) (err error) 
 	payload, err := json.Marshal(s)
 
 	err = d.api.request("POST", "identify", payload)
+	if err != nil {
+		logrus.WithError(err).WithField("identify", identification).WithField("payload", payload).Error("Error sending identify to drift")
+	}
 	return
 }
 
@@ -66,9 +69,12 @@ func (d Drift) Track(event integrations.Event) (err error) {
 	e.CreatedAt = event.Timestamp
 	payload, err := json.Marshal(e)
 	if err != nil {
-		logrus.WithField("err", err).Fatal("Error marshalling drift event to json")
+		logrus.WithError(err).WithField("event", event).WithField("payload", payload).Error("Error marshalling drift event to json")
 	}
 	err = d.api.request("POST", "track", payload)
+	if err != nil {
+		logrus.WithError(err).WithField("event", event).WithField("payload", payload).Error("Error sending event to drift")
+	}
 	return
 }
 
@@ -86,20 +92,35 @@ func (api driftAPIProduction) request(method string, endpoint string, payload []
 	resp, err := client.Do(req)
 	defer resp.Body.Close()
 	if err != nil {
-		logrus.WithField("err", err).Error("Error sending request to Drift api")
+		logrus.WithError(err).WithFields(
+			logrus.Fields{
+				"method":   method,
+				"apiUrl":   apiUrl,
+				"endpoint": endpoint,
+				"payload":  payload}).Error("Error sending request to Drift api")
 		return
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			logrus.WithField("err", err).Error("Error reading body in Drift response")
+			logrus.WithError(err).WithFields(
+				logrus.Fields{
+					"method":     method,
+					"apiUrl":     apiUrl,
+					"endpoint":   endpoint,
+					"payload":    payload,
+					"httpstatus": resp.StatusCode}).Error("Error reading Drift response")
 			return err
 		}
 		logrus.WithFields(
 			logrus.Fields{
 				"response":    string(body),
-				"HTTP-status": resp.StatusCode}).Error("Drift api returned errors")
+				"HTTP-status": resp.StatusCode,
+				"method":      method,
+				"endpoint":    endpoint,
+				"payload":     payload}).Error("Drift api returned errors")
+
 	}
 	return
 }
