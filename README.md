@@ -36,6 +36,12 @@ To send to [Drip][drip]:
 
 **Please note** that you need to send an "email" property to be able to get the Drip integration working.
 
+To send to Drift:
+
+- set `DRIFT_ORG_ID=456` (ATM only possible to find by contacting the drift support dept)
+
+[Mixpanel][mixpanel] and [Keen.io][keen.io] are probably going to be next.
+
 ## Deployment
 
 Forwardlytics can be deployed to [Heroku][heroku]. You can setup the port it starts on by setting the `PORT` environment variable.
