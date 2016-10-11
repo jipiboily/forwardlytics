@@ -1,10 +1,7 @@
 {
 	"ImportPath": "github.com/jipiboily/forwardlytics",
 	"GoVersion": "go1.6",
-	"GodepVersion": "v60",
-	"Packages": [
-		"./..."
-	],
+	"GodepVersion": "v74",
 	"Deps": [
 		{
 			"ImportPath": "github.com/Shopify/logrus-bugsnag",
@@ -33,6 +30,10 @@
 			"ImportPath": "github.com/bugsnag/panicwrap",
 			"Comment": "1.1.0-1-gd6191e2",
 			"Rev": "d6191e27ad06236eaad65d79e49a08b03b9f8029"
+		},
+		{
+			"ImportPath": "github.com/codeship/go-retro",
+			"Rev": "ca7afd6235c27c25077bc2189e102d042f291f8c"
 		},
 		{
 			"ImportPath": "github.com/google/go-querystring/query",

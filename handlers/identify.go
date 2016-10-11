@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/codeship/go-retro"
 	"github.com/jipiboily/forwardlytics/integrations"
 )
 
@@ -47,7 +48,13 @@ func Identify(w http.ResponseWriter, r *http.Request) {
 		integration := integrations.GetIntegration(integrationName)
 		if integration.Enabled() {
 			logrus.Infof("Forwarding idenitify to %s", integrationName)
-			err := integration.Identify(identification)
+			err := retro.DoWithRetry(func() error {
+				e := integration.Identify(identification)
+				if e != nil {
+					return ErrNotReady
+				}
+				return e
+			})
 			if err != nil {
 				errMsg := fmt.Sprintf("Fatal error during identification with an integration (%s): %s", integrationName, err)
 				logrus.WithField("integration", integrationName).WithField("identification", identification).WithField("err", err).Error("Fatal error during identification")
