@@ -1,14 +1,26 @@
 package handlers
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/codeship/go-retro"
 )
 
-var ErrNotReady = retro.NewBackoffRetryableError(errors.New("error: resource not ready"), 10)
+func resourceNotReady(resourceError error) error {
+	if os.Getenv("NUM_RETRIES_ON_ERROR") == "" {
+		return resourceError
+	}
+	numRetries, err := strconv.Atoi(os.Getenv("NUM_RETRIES_ON_ERROR"))
+	if err != nil {
+		logrus.WithField("err", err).Error("env variable NUM_RETRIES_ON_ERROR should be an integer")
+		return err
+	}
+	return retro.NewBackoffRetryableError(resourceError, numRetries)
+}
 
 func writeResponse(w http.ResponseWriter, body string, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")

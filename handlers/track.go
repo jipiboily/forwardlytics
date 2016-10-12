@@ -51,7 +51,7 @@ func Track(w http.ResponseWriter, r *http.Request) {
 			err := retro.DoWithRetry(func() error {
 				e := integration.Track(event)
 				if e != nil {
-					return ErrNotReady
+					return resourceNotReady(e)
 				}
 				return e
 			})

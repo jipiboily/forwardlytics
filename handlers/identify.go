@@ -51,7 +51,7 @@ func Identify(w http.ResponseWriter, r *http.Request) {
 			err := retro.DoWithRetry(func() error {
 				e := integration.Identify(identification)
 				if e != nil {
-					return ErrNotReady
+					return resourceNotReady(e)
 				}
 				return e
 			})
