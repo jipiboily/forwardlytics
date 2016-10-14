@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/codeship/go-retro"
 	"github.com/jipiboily/forwardlytics/integrations"
 )
 
@@ -47,7 +48,13 @@ func Track(w http.ResponseWriter, r *http.Request) {
 		integration := integrations.GetIntegration(integrationName)
 		if integration.Enabled() {
 			logrus.Infof("Forwarding event to %s", integrationName)
-			err := integration.Track(event)
+			err := retro.DoWithRetry(func() error {
+				e := integration.Track(event)
+				if e != nil {
+					return resourceNotReady(e)
+				}
+				return e
+			})
 			if err != nil {
 				errMsg := fmt.Sprintf("Fatal error during event with an integration (%s): %s", integrationName, err)
 				logrus.WithField("integration", integrationName).WithField("event", event).WithField("err", err).Error("Fatal error during event")

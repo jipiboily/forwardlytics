@@ -50,6 +50,15 @@ Forwardlytics can be deployed to [Heroku][heroku]. You can setup the port it sta
 
 Right now Forwardlytics supports tracking error via Bugsnag. Thanks to Logrus, it's pretty easy to add any other bug tracker. PRs welcome.
 
+## Retrying calls on failure
+
+Forwardlytics has a built-in retry-mechanism than can be enabled
+should calls to a provider fail. To enable this, set the environment
+variable `NUM_RETRIES_ON_ERROR=X` where `X` is the number of retries
+to attempt before giving up. This is implemented as an
+[exponential backoff algorithm](https://en.wikipedia.org/wiki/Exponential_backoff).
+
+
 ### Bugsnag config
 
 To enable Bugsnag, set those environment variables:

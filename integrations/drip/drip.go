@@ -95,12 +95,13 @@ func (api dripAPIProduction) request(method string, endpoint string, payload []b
 	req.Header.Set("Content-Type", "application/vnd.api+json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 	if err != nil {
 		logrus.WithError(err).WithField("method", method).WithField("endpoint", endpoint).WithField("payload", payload).Error("Error sending request to Drip api")
 		return
 	}
-
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
