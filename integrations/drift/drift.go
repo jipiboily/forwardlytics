@@ -90,6 +90,9 @@ func (api driftAPIProduction) request(method string, endpoint string, payload []
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 	if err != nil {
 		logrus.WithError(err).WithFields(
 			logrus.Fields{
@@ -99,7 +102,6 @@ func (api driftAPIProduction) request(method string, endpoint string, payload []
 				"payload":  payload}).Error("Error sending request to Drift api")
 		return
 	}
-	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {

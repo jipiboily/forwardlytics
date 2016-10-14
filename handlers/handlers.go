@@ -19,6 +19,7 @@ func resourceNotReady(resourceError error) error {
 		logrus.WithField("err", err).Error("env variable NUM_RETRIES_ON_ERROR should be an integer")
 		return err
 	}
+	logrus.WithField("error", resourceError).Error("Error sending request")
 	return retro.NewBackoffRetryableError(resourceError, numRetries)
 }
 
