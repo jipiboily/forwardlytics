@@ -82,6 +82,11 @@ func (d Drip) Track(event integrations.Event) (err error) {
 	return
 }
 
+func (d Drip) Page(page integrations.Page) (err error) {
+	logrus.Errorf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", page)
+	return
+}
+
 // Enabled returns wether or not the Drip integration is enabled/configured
 func (Drip) Enabled() bool {
 	return apiToken() != "" && accountID() != ""

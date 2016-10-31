@@ -17,6 +17,11 @@ func (fi FakeIntegration) Track(event integrations.Event) error {
 }
 
 // Enabled returns wether or not the integration is enabled/configured
+func (fi FakeIntegration) Page(page integrations.Page) error {
+	return nil
+}
+
+// Enabled returns wether or not the integration is enabled/configured
 func (fi FakeIntegration) Enabled() bool {
 	return true
 }
