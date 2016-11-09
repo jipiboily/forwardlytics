@@ -10,6 +10,7 @@ type Integration interface {
 	// Track forwards the event to the integration
 	Track(event Event) error
 
+	// Page forwards the page-view to the integration
 	Page(page Page) error
 
 	// Enabled returns wether or not the integration is enabled/configured
@@ -44,6 +45,7 @@ func (i Identification) Validate() (missingParameters []string) {
 	return
 }
 
+// Event defines the structure for the incoming event data from the API
 type Event struct {
 	// Name is the name of the event
 	Name string `json:"name"`
@@ -77,6 +79,7 @@ func (e Event) Validate() (missingParameters []string) {
 	return
 }
 
+// Page defines the structure for the incoming page-view data
 type Page struct {
 	// Name is the name of the page
 	Name string `json:"name"`
