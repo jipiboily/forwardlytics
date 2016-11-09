@@ -94,6 +94,11 @@ func (i Intercom) Track(event integrations.Event) (err error) {
 	return
 }
 
+func (d Intercom) Page(page integrations.Page) (err error) {
+	logrus.Errorf("NOT IMPLEMENTED: will send %#v to Intercom\n", page)
+	return
+}
+
 // Enabled returns wether or not the Intercom integration is enabled/configured
 func (i Intercom) Enabled() bool {
 	return apiKey() != "" && appID() != ""

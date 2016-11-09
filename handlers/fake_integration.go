@@ -16,6 +16,11 @@ func (fi FakeIntegration) Track(event integrations.Event) error {
 	return nil
 }
 
+// Page forwards the page-view data to the integration
+func (fi FakeIntegration) Page(page integrations.Page) error {
+	return nil
+}
+
 // Enabled returns wether or not the integration is enabled/configured
 func (fi FakeIntegration) Enabled() bool {
 	return true

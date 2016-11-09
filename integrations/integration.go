@@ -10,6 +10,9 @@ type Integration interface {
 	// Track forwards the event to the integration
 	Track(event Event) error
 
+	// Page forwards the page-view to the integration
+	Page(page Page) error
+
 	// Enabled returns wether or not the integration is enabled/configured
 	Enabled() bool
 }
@@ -42,6 +45,7 @@ func (i Identification) Validate() (missingParameters []string) {
 	return
 }
 
+// Event defines the structure for the incoming event data from the API
 type Event struct {
 	// Name is the name of the event
 	Name string `json:"name"`
@@ -70,6 +74,47 @@ func (e Event) Validate() (missingParameters []string) {
 	}
 
 	if e.Timestamp == 0 {
+		missingParameters = append(missingParameters, "timestamp")
+	}
+	return
+}
+
+// Page defines the structure for the incoming page-view data
+type Page struct {
+	// Name is the name of the page
+	Name string `json:"name"`
+
+	// Unique user ID. Should not change, ever.
+	UserID string `json:"userID"`
+
+	// Unique user ID. Should not change, ever.
+	Url string `json:"url"`
+
+	// Properties are custom variables you can send with the page
+	Properties map[string]interface{} `json:"properties"`
+
+	// Timestamp of when the page-call originally triggered
+	Timestamp int64 `json:"timestamp"`
+
+	// ReceivedAt of when Forwardlytics received the page-call.
+	ReceivedAt int64 `json:"receivedAt"`
+}
+
+// Validate the content of the page to be sure it has everything that's needed
+func (p Page) Validate() (missingParameters []string) {
+	if p.Name == "" {
+		missingParameters = append(missingParameters, "name")
+	}
+
+	if p.Url == "" {
+		missingParameters = append(missingParameters, "url")
+	}
+
+	if p.UserID == "" {
+		missingParameters = append(missingParameters, "userID")
+	}
+
+	if p.Timestamp == 0 {
 		missingParameters = append(missingParameters, "timestamp")
 	}
 	return

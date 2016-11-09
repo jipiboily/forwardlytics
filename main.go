@@ -26,6 +26,7 @@ func main() {
 
 	http.Handle("/identify", handlers.AuthMiddleware(http.HandlerFunc(handlers.Identify)))
 	http.Handle("/track", handlers.AuthMiddleware(http.HandlerFunc(handlers.Track)))
+	http.Handle("/page", handlers.AuthMiddleware(http.HandlerFunc(handlers.Page)))
 	logrus.Infof("Forwardlytics started on port %v", port)
 	logrus.Fatal(http.ListenAndServe(":"+port, nil))
 }

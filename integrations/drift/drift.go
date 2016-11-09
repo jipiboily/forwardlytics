@@ -78,6 +78,11 @@ func (d Drift) Track(event integrations.Event) (err error) {
 	return
 }
 
+func (d Drift) Page(page integrations.Page) (err error) {
+	logrus.Errorf("NOT IMPLEMENTED: will send %#v to Drift\n", page)
+	return
+}
+
 // Enabled returns wether or not the Drift integration is enabled/configured
 func (Drift) Enabled() bool {
 	return orgID() != ""

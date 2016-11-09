@@ -23,6 +23,11 @@ func (Mixpanel) Track(event integrations.Event) (err error) {
 	return
 }
 
+func (Mixpanel) Page(page integrations.Page) (err error) {
+	logrus.Errorf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", page)
+	return
+}
+
 // Enabled returns wether or not the Mixpanel integration is enabled/configured
 func (Mixpanel) Enabled() bool {
 	return apiKey() != "" && token() != ""
