@@ -89,6 +89,41 @@ func TestTrack(t *testing.T) {
 	}
 }
 
+func TestPage(t *testing.T) {
+	os.Setenv("DRIFT_ORG_ID", "321")
+	drift := Drift{}
+	api := APIMock{baseUrl: "http://www.example.com/"}
+	drift.api = &api
+	page := integrations.Page{
+		Name:   "Homepage",
+		UserID: "123",
+		Url:    "http://www.example.com",
+		Properties: map[string]interface{}{
+			"email": "john@example.com",
+		},
+		Timestamp:  1234567,
+		ReceivedAt: 65,
+	}
+
+	err := drift.Page(page)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if api.Method != "POST" {
+		t.Errorf("Expected method to be POST, was: %v", api.Method)
+	}
+
+	if api.Endpoint != "track" {
+		t.Errorf("Expected endpoint to be track, was: %v", api.Endpoint)
+	}
+	expectedPayload := `{"orgId":"321","userId":"123","event":"page","url":"http://www.example.com","createdAt":1234567,"attributes":{"email":"john@example.com","forwardlyticsReceivedAt":65,"name":"Homepage"}}`
+
+	if string(api.Payload) != string(expectedPayload) {
+		t.Errorf("Expected payload: "+string(expectedPayload)+" got: %v", string(api.Payload))
+	}
+}
+
 type MockEvents struct {
 	Events []MockEvent `json:"events"`
 }
