@@ -39,6 +39,15 @@ type apiEvent struct {
 	Attributes map[string]interface{} `json:"attributes"`
 }
 
+type apiPage struct {
+	OrgId      string                 `json:"orgId"`
+	UserId     string                 `json:"userId"`
+	Event      string                 `json:"event"`
+	Url        string                 `json:"url"`
+	CreatedAt  int64                  `json:"createdAt"`
+	Attributes map[string]interface{} `json:"attributes"`
+}
+
 // Identify forwards and identify call to Drift
 func (d Drift) Identify(identification integrations.Identification) (err error) {
 	s := apiSubscriber{}
@@ -78,8 +87,25 @@ func (d Drift) Track(event integrations.Event) (err error) {
 	return
 }
 
+// Page forwards the page-events to Drift
 func (d Drift) Page(page integrations.Page) (err error) {
-	logrus.Errorf("NOT IMPLEMENTED: will send %#v to Drift\n", page)
+	p := apiPage{}
+	p.OrgId = orgID()
+	p.UserId = page.UserID
+	p.Url = page.Url
+	page.Properties["forwardlyticsReceivedAt"] = page.ReceivedAt
+	page.Properties["name"] = page.Name
+	p.Attributes = page.Properties
+	p.Event = "page"
+	p.CreatedAt = page.Timestamp
+	payload, err := json.Marshal(p)
+	if err != nil {
+		logrus.WithError(err).WithField("page", page).WithField("payload", payload).Error("Error marshalling drift page-event to json")
+	}
+	err = d.api.request("POST", "track", payload)
+	if err != nil {
+		logrus.WithError(err).WithField("page", page).WithField("payload", payload).Error("Error sending page-event to drift")
+	}
 	return
 }
 
