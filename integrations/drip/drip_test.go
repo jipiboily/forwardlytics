@@ -148,6 +148,73 @@ func TestTrack(t *testing.T) {
 	}
 }
 
+func TestPageErrorWhenNoEmailPresent(t *testing.T) {
+	os.Setenv("DRIP_API_TOKEN", "123")
+	os.Setenv("DRIP_ACCOUNT_ID", "321")
+	api := &APIMock{Url: "http://www.example.com"}
+	drip := Drip{}
+	drip.api = api
+	page := integrations.Page{
+		Name:       "account.created",
+		UserID:     "123",
+		Properties: map[string]interface{}{},
+		Timestamp:  1234567,
+		ReceivedAt: 65,
+	}
+	err := drip.Page(page)
+	if err == nil {
+		t.Error("Expected error when no email given")
+	}
+}
+
+func TestPage(t *testing.T) {
+	os.Setenv("DRIP_API_TOKEN", "123")
+	os.Setenv("DRIP_ACCOUNT_ID", "321")
+	drip := Drip{}
+	api := APIMock{Url: "http://www.example.com"}
+	drip.api = &api
+	page := integrations.Page{
+		Name:   "account.created",
+		UserID: "123",
+		Properties: map[string]interface{}{
+			"email": "john@example.com",
+		},
+		Timestamp:  1234567,
+		ReceivedAt: 65,
+	}
+
+	err := drip.Page(page)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if api.Method != "POST" {
+		t.Errorf("Expected method to be POST, was: %v", api.Method)
+	}
+
+	if api.Endpoint != "events" {
+		t.Errorf("Expected endpoint to be events, was: %v", api.Endpoint)
+	}
+
+	expectedData := &MockEvents{
+		Events: []MockEvent{
+			{
+				Action:     "page",
+				Email:      "john@example.com",
+				OccurredAt: time.Unix(1234567, 0).Format("2006-01-02T15:04:05-0700"),
+				Properties: MockEventProperties{
+					Email: "john@example.com",
+					ForwardlyticsReceivedAt: 65,
+				},
+			}},
+	}
+
+	expectedPayload, _ := json.Marshal(expectedData)
+	if string(api.Payload) != string(expectedPayload) {
+		t.Errorf("Expected payload: "+string(expectedPayload)+" got: %v", string(api.Payload))
+	}
+}
+
 type MockEvents struct {
 	Events []MockEvent `json:"events"`
 }

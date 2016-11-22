@@ -82,8 +82,24 @@ func (d Drip) Track(event integrations.Event) (err error) {
 	return
 }
 
+// Page forwards the page-events to Drip
+// In the drip integration, page-views are just special case events
 func (d Drip) Page(page integrations.Page) (err error) {
-	logrus.Errorf("NOT IMPLEMENTED: will send %#v to Mixpanel\n", page)
+	if page.Properties["email"] == nil {
+		logrus.WithError(err).WithField("page", page).Error("Drip: Required field email is not present")
+		return errors.New("Email is required for doing a drip request")
+	}
+	e := apiEvent{}
+	e.Email = page.Properties["email"].(string)
+	page.Properties["forwardlyticsReceivedAt"] = page.ReceivedAt
+	e.Action = "page"
+	e.OccurredAt = time.Unix(page.Timestamp, 0).Format("2006-01-02T15:04:05-0700")
+	e.Properties = page.Properties
+	payload, err := json.Marshal(map[string][]apiEvent{"events": []apiEvent{e}})
+	if err != nil {
+		logrus.WithField("err", err).Fatal("Error marshalling drip page-event to json")
+	}
+	err = d.api.request("POST", "events", payload)
 	return
 }
 
