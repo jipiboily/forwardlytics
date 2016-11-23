@@ -92,7 +92,9 @@ func (d Drip) Page(page integrations.Page) (err error) {
 	e := apiEvent{}
 	e.Email = page.Properties["email"].(string)
 	page.Properties["forwardlyticsReceivedAt"] = page.ReceivedAt
-	e.Action = "page"
+	page.Properties["url"] = page.Url
+	page.Properties["pagename"] = page.Name
+	e.Action = "Page visited"
 	e.OccurredAt = time.Unix(page.Timestamp, 0).Format("2006-01-02T15:04:05-0700")
 	e.Properties = page.Properties
 	payload, err := json.Marshal(map[string][]apiEvent{"events": []apiEvent{e}})

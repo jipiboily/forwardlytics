@@ -155,8 +155,9 @@ func TestPageErrorWhenNoEmailPresent(t *testing.T) {
 	drip := Drip{}
 	drip.api = api
 	page := integrations.Page{
-		Name:       "account.created",
+		Name:       "Homepage",
 		UserID:     "123",
+		Url:        "http://www.example.com",
 		Properties: map[string]interface{}{},
 		Timestamp:  1234567,
 		ReceivedAt: 65,
@@ -174,8 +175,9 @@ func TestPage(t *testing.T) {
 	api := APIMock{Url: "http://www.example.com"}
 	drip.api = &api
 	page := integrations.Page{
-		Name:   "account.created",
+		Name:   "Homepage",
 		UserID: "123",
+		Url:    "http://www.example.com",
 		Properties: map[string]interface{}{
 			"email": "john@example.com",
 		},
@@ -196,15 +198,17 @@ func TestPage(t *testing.T) {
 		t.Errorf("Expected endpoint to be events, was: %v", api.Endpoint)
 	}
 
-	expectedData := &MockEvents{
-		Events: []MockEvent{
+	expectedData := &MockPageEvents{
+		Events: []MockPageEvent{
 			{
-				Action:     "page",
+				Action:     "Page visited",
 				Email:      "john@example.com",
 				OccurredAt: time.Unix(1234567, 0).Format("2006-01-02T15:04:05-0700"),
-				Properties: MockEventProperties{
+				Properties: MockPageEventProperties{
 					Email: "john@example.com",
 					ForwardlyticsReceivedAt: 65,
+					PageName:                "Homepage",
+					Url:                     "http://www.example.com",
 				},
 			}},
 	}
@@ -229,6 +233,24 @@ type MockEvent struct {
 type MockEventProperties struct {
 	Email                   string `json:"email"`
 	ForwardlyticsReceivedAt int64  `json:"forwardlyticsReceivedAt"`
+}
+
+type MockPageEvents struct {
+	Events []MockPageEvent `json:"events"`
+}
+
+type MockPageEvent struct {
+	Action     string                  `json:"action"`
+	Email      string                  `json:"email"`
+	OccurredAt string                  `json:"occurred_at"`
+	Properties MockPageEventProperties `json:"properties"`
+}
+
+type MockPageEventProperties struct {
+	Email                   string `json:"email"`
+	ForwardlyticsReceivedAt int64  `json:"forwardlyticsReceivedAt"`
+	PageName                string `json:"pagename"`
+	Url                     string `json:"url"`
 }
 
 type APIMock struct {
