@@ -148,6 +148,77 @@ func TestTrack(t *testing.T) {
 	}
 }
 
+func TestPageErrorWhenNoEmailPresent(t *testing.T) {
+	os.Setenv("DRIP_API_TOKEN", "123")
+	os.Setenv("DRIP_ACCOUNT_ID", "321")
+	api := &APIMock{Url: "http://www.example.com"}
+	drip := Drip{}
+	drip.api = api
+	page := integrations.Page{
+		Name:       "Homepage",
+		UserID:     "123",
+		Url:        "http://www.example.com",
+		Properties: map[string]interface{}{},
+		Timestamp:  1234567,
+		ReceivedAt: 65,
+	}
+	err := drip.Page(page)
+	if err == nil {
+		t.Error("Expected error when no email given")
+	}
+}
+
+func TestPage(t *testing.T) {
+	os.Setenv("DRIP_API_TOKEN", "123")
+	os.Setenv("DRIP_ACCOUNT_ID", "321")
+	drip := Drip{}
+	api := APIMock{Url: "http://www.example.com"}
+	drip.api = &api
+	page := integrations.Page{
+		Name:   "Homepage",
+		UserID: "123",
+		Url:    "http://www.example.com",
+		Properties: map[string]interface{}{
+			"email": "john@example.com",
+		},
+		Timestamp:  1234567,
+		ReceivedAt: 65,
+	}
+
+	err := drip.Page(page)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if api.Method != "POST" {
+		t.Errorf("Expected method to be POST, was: %v", api.Method)
+	}
+
+	if api.Endpoint != "events" {
+		t.Errorf("Expected endpoint to be events, was: %v", api.Endpoint)
+	}
+
+	expectedData := &MockPageEvents{
+		Events: []MockPageEvent{
+			{
+				Action:     "Page visited",
+				Email:      "john@example.com",
+				OccurredAt: time.Unix(1234567, 0).Format("2006-01-02T15:04:05-0700"),
+				Properties: MockPageEventProperties{
+					Email: "john@example.com",
+					ForwardlyticsReceivedAt: 65,
+					PageName:                "Homepage",
+					Url:                     "http://www.example.com",
+				},
+			}},
+	}
+
+	expectedPayload, _ := json.Marshal(expectedData)
+	if string(api.Payload) != string(expectedPayload) {
+		t.Errorf("Expected payload: "+string(expectedPayload)+" got: %v", string(api.Payload))
+	}
+}
+
 type MockEvents struct {
 	Events []MockEvent `json:"events"`
 }
@@ -162,6 +233,24 @@ type MockEvent struct {
 type MockEventProperties struct {
 	Email                   string `json:"email"`
 	ForwardlyticsReceivedAt int64  `json:"forwardlyticsReceivedAt"`
+}
+
+type MockPageEvents struct {
+	Events []MockPageEvent `json:"events"`
+}
+
+type MockPageEvent struct {
+	Action     string                  `json:"action"`
+	Email      string                  `json:"email"`
+	OccurredAt string                  `json:"occurred_at"`
+	Properties MockPageEventProperties `json:"properties"`
+}
+
+type MockPageEventProperties struct {
+	Email                   string `json:"email"`
+	ForwardlyticsReceivedAt int64  `json:"forwardlyticsReceivedAt"`
+	PageName                string `json:"pagename"`
+	Url                     string `json:"url"`
 }
 
 type APIMock struct {
