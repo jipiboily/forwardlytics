@@ -260,6 +260,165 @@ func TestTrackWhenAPropertyIsAMap(t *testing.T) {
 	}
 }
 
+func TestPage(t *testing.T) {
+	ic := Intercom{}
+	ic.Client = intercom.NewClient("", "")
+	es := &FakeIntercomEventsService{t: t}
+	ic.EventRepository = es
+
+	event := integrations.Page{
+		Name:   "Homepage",
+		UserID: "123",
+		Url:    "http://www.example.com/homepage",
+		Properties: map[string]interface{}{
+			"email": "john@example.com",
+		},
+		Timestamp:  1234567,
+		ReceivedAt: 65,
+	}
+
+	err := ic.Page(event)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !es.SaveCalled {
+		t.Error("Save was NOT called on the event")
+	}
+
+	expectedPageEvent := &intercom.Event{
+		UserID:    "123",
+		EventName: "Page visited",
+		Metadata: map[string]interface{}{
+			"email": "john@example.com",
+			"url":   "http://www.example.com/homepage",
+			"forwardlyticsReceivedAt": int64(65),
+			"forwardlyticsName":       "Homepage",
+		},
+		Email:     "john@example.com",
+		CreatedAt: 1234567,
+	}
+
+	if !reflect.DeepEqual(es.ReceivedEvent, expectedPageEvent) {
+		es.t.Errorf("Wrong page-event. Expected \n%#v\n but got \n%#v\n", expectedPageEvent, es.ReceivedEvent)
+	}
+}
+
+func TestPageWhenFail(t *testing.T) {
+	ic := Intercom{}
+	ic.Client = intercom.NewClient("", "")
+	es := &FakeIntercomEventsServiceFailing{t: t}
+	ic.EventRepository = es
+
+	event := integrations.Page{
+		Name:   "Homepage",
+		UserID: "123",
+		Url:    "http://www.example.com/homepage",
+		Properties: map[string]interface{}{
+			"email": "john@example.com",
+		},
+		Timestamp:  1234567,
+		ReceivedAt: 65,
+	}
+
+	err := ic.Page(event)
+	if err == nil {
+		t.Fatal("Expecting an error")
+	}
+
+	if !es.SaveCalled {
+		t.Error("Save was NOT called on the event")
+	}
+}
+
+func TestPageWhenUserDoesNotExists(t *testing.T) {
+	ic := Intercom{}
+	ic.Client = intercom.NewClient("", "")
+	es := &FakeIntercomEventsServiceFailingWithNotFound{t: t}
+	ic.EventRepository = es
+	service := &FakeIntercomAPISuccessCreateNewUserFromTrack{t: t}
+	ic.Service = service
+
+	event := integrations.Page{
+		Name:   "Homepage",
+		UserID: "123",
+		Url:    "http://www.example.com/homepage",
+		Properties: map[string]interface{}{
+			"email": "john@example.com",
+		},
+		Timestamp:  1234567,
+		ReceivedAt: 65,
+	}
+
+	err := ic.Page(event)
+	if err != nil {
+		herr, ok := err.(intercom.IntercomError)
+		if !ok || herr.GetCode() != "not_found" {
+			t.Fatal(err)
+		}
+	}
+
+	if !es.SaveCalled {
+		t.Error("Save was NOT called on the event")
+	}
+
+	if service.SaveCalled {
+		t.Error("New Intercom user was created, and it should not")
+	}
+}
+
+func TestPageWhenAPropertyIsAMap(t *testing.T) {
+	// It removes the properties that are map, as they are not supported
+	// by Intercom. See the `Metadata support` section of
+	// https://docs.intercom.io/the-intercom-platform/tracking-events-in-intercom
+	ic := Intercom{}
+	ic.Client = intercom.NewClient("", "")
+	es := &FakeIntercomEventsService{t: t}
+	ic.EventRepository = es
+
+	settings := map[string]interface{}{
+		"metric_name": "rt:activeUsers",
+	}
+
+	event := integrations.Page{
+		Name:   "Homepage",
+		UserID: "123",
+		Url:    "http://www.example.com/homepage",
+		Properties: map[string]interface{}{
+			"email":    "john@example.com",
+			"settings": settings,
+		},
+		Timestamp:  1234567,
+		ReceivedAt: 65,
+	}
+
+	err := ic.Page(event)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !es.SaveCalled {
+		t.Error("Save was NOT called on the event")
+	}
+
+	expectedPageEvent := &intercom.Event{
+		UserID:    "123",
+		EventName: "Page visited",
+		Metadata: map[string]interface{}{
+			"email": "john@example.com",
+			"url":   "http://www.example.com/homepage",
+			"forwardlyticsReceivedAt": int64(65),
+			"forwardlyticsName":       "Homepage",
+		},
+		Email:     "john@example.com",
+		CreatedAt: 1234567,
+	}
+
+	if !reflect.DeepEqual(es.ReceivedEvent, expectedPageEvent) {
+		es.t.Errorf("Wrong event. Expected \n%#v\n but got \n%#v\n", expectedPageEvent, es.ReceivedEvent)
+	}
+}
+
 func TestEnabledWhenConfigured(t *testing.T) {
 	if err := os.Setenv("INTERCOM_API_KEY", "ABC"); err != nil {
 		t.Fatal(err)
