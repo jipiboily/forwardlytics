@@ -94,8 +94,40 @@ func (i Intercom) Track(event integrations.Event) (err error) {
 	return
 }
 
-func (d Intercom) Page(page integrations.Page) (err error) {
-	logrus.Errorf("NOT IMPLEMENTED: will send %#v to Intercom\n", page)
+// Page tracks page views. Intercom doesn't support a special type for
+// this, so it's implemented as a special type of event
+func (p Intercom) Page(page integrations.Page) (err error) {
+	icPage := intercom.Event{}
+	icPage.UserID = page.UserID
+	icPage.EventName = "Page visited"
+	icPage.CreatedAt = page.Timestamp
+
+	// It removes the properties that are map, as they are not supported
+	// by Intercom. See the `Metadata support` section of
+	// https://docs.intercom.io/the-intercom-platform/tracking-events-in-intercom
+	metaData := make(map[string]interface{})
+	for k, v := range page.Properties {
+		if !(reflect.TypeOf(page.Properties[k]).Kind() == reflect.Map) {
+			metaData[k] = v
+		}
+	}
+
+	metaData["forwardlyticsReceivedAt"] = page.ReceivedAt
+	metaData["forwardlyticsName"] = page.Name
+	metaData["url"] = page.Url
+
+	icPage.Metadata = metaData
+
+	if page.Properties["email"] != nil {
+		icPage.Email = page.Properties["email"].(string)
+	}
+
+	err = p.EventRepository.Save(&icPage)
+
+	if err != nil {
+		logrus.WithError(err).WithField("event", page).WithField("icPage", icPage).Error("Error while saving event on Intercom")
+	}
+
 	return
 }
 
