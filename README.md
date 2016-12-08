@@ -77,6 +77,25 @@ You have two options:
 - send a PR adding it.
 - [get in touch to have it added by the author (for a fee)][email].
 
+## How to add a new integration
+
+To add a new integration you need to add a package that implements the
+[Integration interface](integrations/integration.go) to a separate
+folder in the [integrations/](integrations/) subfolder of this
+project, usually named after the integration. The integration should
+be toggled by adding an ENV-variable that is picked up by the
+`Enabled()`-function in the integration and that is passed to
+forwardlytics on startup. To activate the new integration, add the
+path to the new integration in the import-statement in
+[main.go](main.go). Remember to add an `init()` function to the new
+package that registers the new integration using
+`integrations.RegisterIntegration(<integration-name>,
+integration)`. For examples, see the different integrations in the
+[integrations/](integrations/) subfolder
+(eg. [the drip-integration](integrations/drip/drip.go)). Don't forget
+to add tests for all endpoints and for other integration spesific
+stuff.
+
 ## Calling the API
 
 cURL example:
