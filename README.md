@@ -40,7 +40,7 @@ To send to Drift:
 
 - set `DRIFT_ORG_ID=456` (ATM only possible to find by contacting the drift support dept)
 
-[Mixpanel][mixpanel] and [Keen.io][keen.io] are probably going to be next.
+[Mixpanel][mixpanel] is probably going to be next.
 
 ## Deployment
 
