@@ -114,6 +114,7 @@ func TestIdentifyWhenFail(t *testing.T) {
 func TestTrack(t *testing.T) {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
+	ic.Service = &FakeIntercomAPIWhenCreate{}
 	es := &FakeIntercomEventsService{t: t}
 	ic.EventRepository = es
 
@@ -155,6 +156,7 @@ func TestTrack(t *testing.T) {
 func TestTrackWhenFail(t *testing.T) {
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
+	ic.Service = &FakeIntercomAPIWhenCreate{}
 	es := &FakeIntercomEventsServiceFailing{t: t}
 	ic.EventRepository = es
 
@@ -217,6 +219,7 @@ func TestTrackWhenAPropertyIsAMap(t *testing.T) {
 	// https://docs.intercom.io/the-intercom-platform/tracking-events-in-intercom
 	ic := Intercom{}
 	ic.Client = intercom.NewClient("", "")
+	ic.Service = &FakeIntercomAPIWhenCreate{}
 	es := &FakeIntercomEventsService{t: t}
 	ic.EventRepository = es
 

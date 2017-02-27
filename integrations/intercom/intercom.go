@@ -81,8 +81,32 @@ func (i Intercom) Track(event integrations.Event) (err error) {
 
 	icEvent.Metadata = metaData
 
+	// User needs to exist before we send event
+	userAutoCreated := false
+	icUser, err := i.Service.FindByUserID(event.UserID)
+	if err != nil {
+		if strings.Contains(err.Error(), "not_found") {
+			// The user doesn't exist, we just need to create it.
+			userAutoCreated = true
+			icUser = intercom.User{UserID: icEvent.UserID}
+		} else {
+			logrus.WithError(err).WithField("event", event).Error("Error fetching the Intercom user")
+		}
+	}
+
 	if event.Properties["email"] != nil {
 		icEvent.Email = event.Properties["email"].(string)
+		icUser.Email = icEvent.Email
+	}
+
+	// If we auto created the user, save it now
+	if userAutoCreated {
+		savedUser, err := i.Service.Save(icUser)
+		if err == nil {
+			logrus.WithField("savedUser", savedUser).Info("User doesn't exist and was auto-created on Intercom")
+		} else {
+			logrus.WithError(err).WithField("event", event).WithField("icUser", icUser).Error("Error while auto-creating user on Intercom")
+		}
 	}
 
 	err = i.EventRepository.Save(&icEvent)
