@@ -122,13 +122,13 @@ func (api dripAPIProduction) request(method string, endpoint string, payload []b
 		defer resp.Body.Close()
 	}
 	if err != nil {
-		logrus.WithError(err).WithField("method", method).WithField("endpoint", endpoint).WithField("payload", string(payload)).Error("Error sending request to Drip api")
+		logrus.WithError(err).WithField("method", method).WithField("endpoint", endpoint).WithField("payload", payload).Error("Error sending request to Drip api")
 		return
 	}
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			logrus.WithError(err).WithField("method", method).WithField("endpoint", endpoint).WithField("payload", string(payload)).Error("Error reading body in Drip response")
+			logrus.WithError(err).WithField("method", method).WithField("endpoint", endpoint).WithField("payload", payload).Error("Error reading body in Drip response")
 			return err
 		}
 		logrus.WithField("method", method).WithField("endpoint", endpoint).WithField("payload", payload).WithFields(
