@@ -62,7 +62,7 @@ func (d Drift) Identify(identification integrations.Identification) (err error) 
 
 	err = d.api.request("POST", "identify", payload)
 	if err != nil {
-		logrus.WithError(err).WithField("identify", identification).WithField("payload", payload).Error("Error sending identify to drift")
+		logrus.WithError(err).WithField("identify", identification).WithField("payload", string(payload[:])).Error("Error sending identify to drift")
 	}
 	return
 }
@@ -78,11 +78,11 @@ func (d Drift) Track(event integrations.Event) (err error) {
 	e.CreatedAt = event.Timestamp
 	payload, err := json.Marshal(e)
 	if err != nil {
-		logrus.WithError(err).WithField("event", event).WithField("payload", payload).Error("Error marshalling drift event to json")
+		logrus.WithError(err).WithField("event", event).WithField("payload", string(payload[:])).Error("Error marshalling drift event to json")
 	}
 	err = d.api.request("POST", "track", payload)
 	if err != nil {
-		logrus.WithError(err).WithField("event", event).WithField("payload", payload).Error("Error sending event to drift")
+		logrus.WithError(err).WithField("event", event).WithField("payload", string(payload[:])).Error("Error sending event to drift")
 	}
 	return
 }
@@ -100,11 +100,11 @@ func (d Drift) Page(page integrations.Page) (err error) {
 	p.CreatedAt = page.Timestamp
 	payload, err := json.Marshal(p)
 	if err != nil {
-		logrus.WithError(err).WithField("page", page).WithField("payload", payload).Error("Error marshalling drift page-event to json")
+		logrus.WithError(err).WithField("page", page).WithField("payload", string(payload[:])).Error("Error marshalling drift page-event to json")
 	}
 	err = d.api.request("POST", "track", payload)
 	if err != nil {
-		logrus.WithError(err).WithField("page", page).WithField("payload", payload).Error("Error sending page-event to drift")
+		logrus.WithError(err).WithField("page", page).WithField("payload", string(payload[:])).Error("Error sending page-event to drift")
 	}
 	return
 }
@@ -130,7 +130,7 @@ func (api driftAPIProduction) request(method string, endpoint string, payload []
 				"method":   method,
 				"apiUrl":   apiUrl,
 				"endpoint": endpoint,
-				"payload":  payload}).Error("Error sending request to Drift api")
+				"payload":  string(payload[:])}).Error("Error sending request to Drift api")
 		return
 	}
 	if resp.StatusCode != http.StatusOK {
@@ -141,7 +141,7 @@ func (api driftAPIProduction) request(method string, endpoint string, payload []
 					"method":     method,
 					"apiUrl":     apiUrl,
 					"endpoint":   endpoint,
-					"payload":    payload,
+					"payload":    string(payload[:]),
 					"httpstatus": resp.StatusCode}).Error("Error reading Drift response")
 			return err
 		}
@@ -151,7 +151,7 @@ func (api driftAPIProduction) request(method string, endpoint string, payload []
 				"HTTP-status": resp.StatusCode,
 				"method":      method,
 				"endpoint":    endpoint,
-				"payload":     payload}).Error("Drift api returned errors")
+				"payload":     string(payload[:])}).Error("Drift api returned errors")
 
 	}
 	return
