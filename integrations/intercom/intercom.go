@@ -120,7 +120,7 @@ func (i Intercom) Track(event integrations.Event) (err error) {
 
 // Page tracks page views. Intercom doesn't support a special type for
 // this, so it's implemented as a special type of event
-func (p Intercom) Page(page integrations.Page) (err error) {
+func (i Intercom) Page(page integrations.Page) (err error) {
 	icPage := intercom.Event{}
 	icPage.UserID = page.UserID
 	icPage.EventName = "Page visited"
@@ -146,7 +146,7 @@ func (p Intercom) Page(page integrations.Page) (err error) {
 		icPage.Email = page.Properties["email"].(string)
 	}
 
-	err = p.EventRepository.Save(&icPage)
+	err = i.EventRepository.Save(&icPage)
 
 	if err != nil {
 		logrus.WithError(err).WithField("event", page).WithField("icPage", icPage).Error("Error while saving event on Intercom")
