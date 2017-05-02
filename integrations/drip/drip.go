@@ -46,9 +46,9 @@ func (d Drip) Identify(identification integrations.Identification) (err error) {
 	if identification.UserTraits["email"] == nil {
 		logrus.WithField("identification", identification).Error("Drip: Required field email is not present")
 		return errors.New("Email is required for doing a drip request")
-	} else {
-		s.Email = identification.UserTraits["email"].(string)
 	}
+
+	s.Email = identification.UserTraits["email"].(string)
 
 	s.UserId = string(identification.UserID)
 
@@ -57,7 +57,7 @@ func (d Drip) Identify(identification integrations.Identification) (err error) {
 	s.CustomFields["forwardlyticsReceivedAt"] = identification.ReceivedAt
 	s.CustomFields["forwardlyticsTimestamp"] = identification.Timestamp
 
-	payload, err := json.Marshal(map[string][]apiSubscriber{"subscribers": []apiSubscriber{s}})
+	payload, err := json.Marshal(map[string][]apiSubscriber{"subscribers": {s}})
 	err = d.api.request("POST", "subscribers", payload)
 	return
 }
@@ -74,7 +74,7 @@ func (d Drip) Track(event integrations.Event) (err error) {
 	e.Action = event.Name
 	e.OccurredAt = time.Unix(event.Timestamp, 0).Format("2006-01-02T15:04:05-0700")
 	e.Properties = event.Properties
-	payload, err := json.Marshal(map[string][]apiEvent{"events": []apiEvent{e}})
+	payload, err := json.Marshal(map[string][]apiEvent{"events": {e}})
 	if err != nil {
 		logrus.WithField("err", err).Fatal("Error marshalling drip event to json")
 	}
@@ -97,7 +97,7 @@ func (d Drip) Page(page integrations.Page) (err error) {
 	e.Action = "Page visited"
 	e.OccurredAt = time.Unix(page.Timestamp, 0).Format("2006-01-02T15:04:05-0700")
 	e.Properties = page.Properties
-	payload, err := json.Marshal(map[string][]apiEvent{"events": []apiEvent{e}})
+	payload, err := json.Marshal(map[string][]apiEvent{"events": {e}})
 	if err != nil {
 		logrus.WithField("err", err).Fatal("Error marshalling drip page-event to json")
 	}
