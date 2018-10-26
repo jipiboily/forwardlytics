@@ -130,11 +130,10 @@ You need to set environment variables for the integrations you want to work with
 Thanks to my friend <a href="https://twitter.com/juliandoesstuff" target="_blank">Julian</a> for the logo! :grinning:
 
 [email]: mailto:jp@metrics.watch
-[metricswatch]: http://metricswatch.com
+[metricswatch]: https://metricswatch.com
 [intercom]: https://www.intercom.io/
 [mixpanel]: https://mixpanel.com/
 [drip]: http://getdrip.com/
-[keen.io]: http://keen.io/
 [heroku]: https://www.heroku.com/
 [forwardlytics-on-waffle]: https://waffle.io/jipiboily/forwardlytics
 [integration.go]: https://github.com/jipiboily/forwardlytics/blob/master/integrations/integration.go
