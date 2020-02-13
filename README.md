@@ -14,10 +14,7 @@ Where are we at? Can you use it in production?
 
 It is used by [Metrics Watch][metricswatch] for now and it has been for a while now. I would not say it is rock solid but it has been working well enough for us.
 
-What needs to be done and what's in the pipeline? See [Forwardlytics on waffle.io][forwardlytics-on-waffle]
-
 [![Build Status](https://travis-ci.org/jipiboily/forwardlytics.svg?branch=master)](https://travis-ci.org/jipiboily/forwardlytics)
-[![Stories in Progress](https://badge.waffle.io/jipiboily/forwardlytics.svg?label=In%20Progress&title=In%20Progress)](http://waffle.io/jipiboily/forwardlytics)
 
 ## Installation
 
@@ -31,7 +28,7 @@ To send to [Intercom][intercom]:
 
 To send to [Drip][drip]:
 
-- set `DRIP_ACCOUNT_ID=234` (found here: https://www.getdrip.com/{drip_account_id}/settings/site under "3rd party integrations")
+- set `DRIP_ACCOUNT_ID=234` (when you log in Drip, you see it in the URL here: https://www.getdrip.com/{drip_account_id}/dashboard)
 - set `DRIP_API_TOKEN=432` (found here: https://www.getdrip.com/user/edit under "API-token")
 
 **Please note** that you need to send an "email" property to be able to get the Drip integration working.
@@ -84,7 +81,7 @@ To add a new integration you need to add a package that implements the
 folder in the [integrations/](integrations/) subfolder of this
 project, usually named after the integration. The integration should
 be toggled by adding an ENV-variable that is picked up by the
-`Enabled()`-function in the integration and that is passed to
+`Enabled()`-function in the intexgration and that is passed to
 forwardlytics on startup. To activate the new integration, add the
 path to the new integration in the import-statement in
 [main.go](main.go). Remember to add an `init()` function to the new
@@ -121,6 +118,10 @@ If you want auto reloading, install [codegangsta/gin][codegangsta/gin] and run:
 
 You need to set environment variables for the integrations you want to work with.
 
+## Running tests
+
+`go test -v ./...`
+
 ## Why?
 
 [Read "Self-hosted Segment equivalent?" on Medium][self-hosted-segment-equivalent]
@@ -136,7 +137,6 @@ Thanks to my friend <a href="https://twitter.com/juliandoesstuff" target="_blank
 [drip]: http://getdrip.com/
 [keen.io]: http://keen.io/
 [heroku]: https://www.heroku.com/
-[forwardlytics-on-waffle]: https://waffle.io/jipiboily/forwardlytics
 [integration.go]: https://github.com/jipiboily/forwardlytics/blob/master/integrations/integration.go
 [codegangsta/gin]: https://github.com/codegangsta/gin
 [https://github.com/tools/godep]: https://github.com/tools/godep
