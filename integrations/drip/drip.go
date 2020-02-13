@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -37,6 +38,16 @@ type apiEvent struct {
 	Email      string                 `json:"email"`
 	OccurredAt string                 `json:"occurred_at"`
 	Properties map[string]interface{} `json:"properties"`
+}
+
+type dripAPIError struct {
+	Code      string `json:"code"`
+	Attribute string `json:"attribute"`
+	Message   string `json:"message"`
+}
+
+type dripAPIResult struct {
+	Errors []dripAPIError `json:"errors"`
 }
 
 // Identify forwards and identify call to Drip
@@ -102,6 +113,9 @@ func (d Drip) Page(page integrations.Page) (err error) {
 		logrus.WithField("err", err).Fatal("Error marshalling drip page-event to json")
 	}
 	err = d.api.request("POST", "events", payload)
+	if err != nil {
+		logrus.WithField("err", err).Fatal("Error from the Drip API...")
+	}
 	return
 }
 
@@ -131,10 +145,18 @@ func (api dripAPIProduction) request(method string, endpoint string, payload []b
 			logrus.WithError(err).WithField("method", method).WithField("endpoint", endpoint).WithField("payload", string(payload[:])).Error("Error reading body in Drip response")
 			return err
 		}
+
+		var apiResult dripAPIResult
+		json.Unmarshal(body, &apiResult)
+
+		errorDetails := fmt.Sprintf("[%s] %s (on attribute: %s)", apiResult.Errors[0].Code, apiResult.Errors[0].Message, apiResult.Errors[0].Attribute)
+		errorMessage := "Drip API returned errors: " + errorDetails
+
 		logrus.WithField("method", method).WithField("endpoint", endpoint).WithField("payload", string(payload[:])).WithFields(
 			logrus.Fields{
 				"response":    string(body),
-				"HTTP-status": resp.StatusCode}).Error("Drip api returned errors")
+				"HTTP-status": resp.StatusCode}).Error(errorMessage)
+		return errors.New(errorMessage)
 	}
 	return
 }
