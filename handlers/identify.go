@@ -57,7 +57,7 @@ func Identify(w http.ResponseWriter, r *http.Request) {
 			})
 			if err != nil {
 				errMsg := fmt.Sprintf("Fatal error during identification with an integration (%s): %s", integrationName, err)
-				logrus.WithField("integration", integrationName).WithField("identification", identification).WithField("err", err).Error("Fatal error during identification")
+				logrus.WithField("integration", integrationName).WithField("identification", identification).WithField("err", err).Error(errMsg)
 				writeResponse(w, errMsg, 500)
 				return
 			}
