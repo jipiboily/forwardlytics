@@ -1,3 +1,5 @@
+# [DEPRECATED] This project is not maintained anymore nor used by the original author.
+
 <p align="center">
   <img src="https://s3.amazonaws.com/forwardlytics-assets/logo-color.svg">
 </p>
@@ -12,7 +14,7 @@ Looking for a Forwardlytics client library? There is one for [Ruby just here](ht
 
 Where are we at? Can you use it in production?
 
-It is used by [Metrics Watch][metricswatch] for now and it has been for a while now. I would not say it is rock solid but it has been working well enough for us.
+[DEPRECATED] This project is not maintained anymore nor used by the original author.
 
 [![Build Status](https://travis-ci.org/jipiboily/forwardlytics.svg?branch=master)](https://travis-ci.org/jipiboily/forwardlytics)
 
